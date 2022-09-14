@@ -1,4 +1,6 @@
-
+<p align="center">
+<img src="https://media.giphy.com/media/l0IylOPCNkiqOgMyA/giphy.gif" width="500">
+  </p>
 
 # iPlan 🗓
 Trying to plan an event can be hectic, messy, and hard to keep up with. iPlan helps you plan your event down to the finest details without the stress of having to look at multiple different places because everything is going to be compiled in one place, just a touch away.
