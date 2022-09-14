@@ -5,12 +5,6 @@
 # iPlan 🗓
 Trying to plan an event can be hectic, messy, and hard to keep up with. iPlan helps you plan your event down to the finest details without the stress of having to look at multiple different places because everything is going to be compiled in one place, just a touch away.
 
-# THEE best developers EVER
-  - Matthew Sheldon
-  - Sharun Naicker
-  - Jennifer Zhang
-  - Casandra Marquez
-
 # MVP
   - Budget finances and allow user to categorize by shared, individual, and immediate expenses
   - Let users set deadlines in a calendar/timer and send custom notifications to remind them of the task
@@ -94,4 +88,8 @@ Frontend AND Backend
   - [Add Firebase to Android](https://firebase.google.com/docs/android/setup)
   - [Flutter & Firebase](https://www.youtube.com/watch?v=sfA3NWDBPZ4&list=PL4cUxeGkcC9j--TKIdkb3ISfRbJeJYQwC)
       
-   
+# THEE best developers EVER (too good 😁👍🏽)
+  - Matthew Sheldon
+  - Sharun Naicker
+  - Jennifer Zhang
+  - Casandra Marquez
