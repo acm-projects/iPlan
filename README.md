@@ -58,38 +58,38 @@ Frontend AND Backend
   - **Backend**: Firebase/Node.js
       - Firebase handles flat data and simple queries very well, while firestore handles more complex data and advanced queries better
       - Node.js is high performance and has better scalability. 
-      - Calendar API: [calendar api] (https://developers.google.com/calendar/api)
-      - Contact Picker API: [contact picker api] (https://developer.mozilla.org/en-US/docs/Web/API/Contact_Picker_API)
-      - Notifications API: [notifications api] (https://docs.notificationapi.com/)
+      - Calendar API: [calendar api](https://developers.google.com/calendar/api)
+      - Contact Picker API: [contact picker api](https://developer.mozilla.org/en-US/docs/Web/API/Contact_Picker_API)
+      - Notifications API: [notifications api](https://docs.notificationapi.com/)
       
 # Software to Install
-  - [Android Studio] (https://developer.android.com/studio/install)
-  - [Figma] (https://www.figma.com/downloads/)
-  - [Flutter] (https://docs.flutter.dev/get-started/install) / [React Native] (https://archive.reactnative.dev/docs/getting-started)
-  - [Firebase] (https://firebase.google.com/docs/cli) / [Node.js] (https://nodejs.org/en/download/)
-  - [Git} (https://git-scm.com/downloads)
+  - [Android Studio](https://developer.android.com/studio/install)
+  - [Figma](https://www.figma.com/downloads/)
+  - [Flutter](https://docs.flutter.dev/get-started/install) / [React Native](https://archive.reactnative.dev/docs/getting-started)
+  - [Firebase](https://firebase.google.com/docs/cli) / [Node.js](https://nodejs.org/en/download/)
+  - [Git](https://git-scm.com/downloads)
   
 # Tutorials and Resources
   - **This is not a complete list of resources. You may change a lot of things during the semester but this is to help you as much as possible!**
   
   **General**
-  - [Success in ACM Projects] (https://docs.google.com/document/d/18Zi3DrKG5e6g5Bojr8iqxIu6VIGl86YBSFlsnJnlM88/edit#heading=h.ky82xv3vtbpi)
-  - Installing Android Studio: [Windows] (https://www.youtube.com/watch?v=0zx_eFyHRU0) / [iOS] (https://www.youtube.com/watch?v=ri90tcQL-Aw)
-  - [API Crash Course w/ timestamps] (https://www.youtube.com/watch?v=GZvSYJDk-us)
-  - [GitHub Cheat Sheet #1] (https://education.github.com/git-cheat-sheet-education.pdf)
-  - [GitHub Cheat Sheet #2) (https://drive.google.com/file/d/1OddwoSvNJ3dQuEBw3RERieMXmOicif9_/view)
+  - [Success in ACM Projects](https://docs.google.com/document/d/18Zi3DrKG5e6g5Bojr8iqxIu6VIGl86YBSFlsnJnlM88/edit#heading=h.ky82xv3vtbpi)
+  - Installing Android Studio: [Windows](https://www.youtube.com/watch?v=0zx_eFyHRU0) / [iOS](https://www.youtube.com/watch?v=ri90tcQL-Aw)
+  - [API Crash Course w/ timestamps](https://www.youtube.com/watch?v=GZvSYJDk-us)
+  - [GitHub Cheat Sheet #1](https://education.github.com/git-cheat-sheet-education.pdf)
+  - [GitHub Cheat Sheet #2](https://drive.google.com/file/d/1OddwoSvNJ3dQuEBw3RERieMXmOicif9_/view)
   
   **Front-end**
-  - [Introduction to Wireframing in Figma] (https://www.youtube.com/watch?v=6t_dYhXyYjI)
-  - [Flutter Crash Course (playlist!)] (https://www.youtube.com/playlist?list=PL4cUxeGkcC9jLYyp2Aoh6hcWuxFDX6PBJ)
-  - [React Native Crash Course (playlist!)] (https://www.youtube.com/watch?v=ur6I5m2nTvk&list=PL4cUxeGkcC9ixPU-QkScoRBVxtPPzVjrQ)
-  - [27 Best UI/UX Practices] (https://729solutions.com/ux-ui-best-practices/)
+  - [Introduction to Wireframing in Figma](https://www.youtube.com/watch?v=6t_dYhXyYjI)
+  - [Flutter Crash Course (playlist!)](https://www.youtube.com/playlist?list=PL4cUxeGkcC9jLYyp2Aoh6hcWuxFDX6PBJ)
+  - [React Native Crash Course (playlist!)](https://www.youtube.com/watch?v=ur6I5m2nTvk&list=PL4cUxeGkcC9ixPU-QkScoRBVxtPPzVjrQ)
+  - [27 Best UI/UX Practices](https://729solutions.com/ux-ui-best-practices/)
   
   **Back-end**
-  - [Dart Crash Course w/ timestamps] (https://www.youtube.com/watch?v=5xlVP04905w)
-  - [Node.js Crash Course (playlist!)] (https://www.youtube.com/watch?v=zb3Qk8SG5Ms&list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU)
-  - [Google Calendar w/ Firebase Authentication] (https://www.youtube.com/watch?v=Bj15-6rBHQw)
-  - [Add Firebase to Android] (https://firebase.google.com/docs/android/setup)
-  - [Flutter & Firebase] (https://www.youtube.com/watch?v=sfA3NWDBPZ4&list=PL4cUxeGkcC9j--TKIdkb3ISfRbJeJYQwC)
+  - [Dart Crash Course w/ timestamps](https://www.youtube.com/watch?v=5xlVP04905w)
+  - [Node.js Crash Course (playlist!)](https://www.youtube.com/watch?v=zb3Qk8SG5Ms&list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU)
+  - [Google Calendar w/ Firebase Authentication](https://www.youtube.com/watch?v=Bj15-6rBHQw)
+  - [Add Firebase to Android](https://firebase.google.com/docs/android/setup)
+  - [Flutter & Firebase](https://www.youtube.com/watch?v=sfA3NWDBPZ4&list=PL4cUxeGkcC9j--TKIdkb3ISfRbJeJYQwC)
       
    
