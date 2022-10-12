@@ -7,14 +7,36 @@ void main() async {
   CollaborationPage collaborationPage =
       CollaborationPage(title: "Test Event", date: "October 12, 2022");
   await collaborationPage.constructorHelperMethod();
+
   print("Title: ${collaborationPage.getTitle()}");
   print("Date: ${collaborationPage.getDate()}");
-  print("Names that contain \"Sheldon\":\n"
-    "${collaborationPage.getNamesFromSearch(substring: "Sheldon")}");
+
+  print("Names that contain \"Sheldon\":\n");
+  List<String> matchingNames =
+      await collaborationPage.getNamesFromSearch(substring: "Sheldon");
+  String output = "[";
+  for (String name in matchingNames) {
+    output += "$name, ";
+  }
+  output = output.substring(0, output.length - 2);
+  output += "]";
+  print(output);
+
   print("Contacts that contain \"Sheldon\":\n");
-  List<Contact> matchingContacts = await collaborationPage.getContactsFromSearch(substring: "Sheldon");
-  for(Contact contact in matchingContacts) {
+  List<Contact> matchingContacts =
+      await collaborationPage.getContactsFromSearch(substring: "Sheldon");
+  for (Contact contact in matchingContacts) {
     print(collaborationPage.contactToString(contact: contact));
   }
-  
+
+  print("Names that contain \"ab\":\n");
+  matchingNames =
+      await collaborationPage.getNamesFromSearch(substring: "ab");
+  output = "[";
+  for (String name in matchingNames) {
+    output += "$name, ";
+  }
+  output = output.substring(0, output.length - 2);
+  output += "]";
+  print(output);
 }
