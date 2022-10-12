@@ -34,13 +34,12 @@ class CollaborationPage {
   CollaborationPage({required String title, required String date}) {
     _title = title;
     _date = date;
-    _constructorHelperMethod();
   }
 
   /// Used by the [CollaborationPage] constructor to mitigate the issue of
   /// asynchronous methods and constructor conflicts. Finished initializing
   /// the [ContactPuller] and [ContactMap] objects.
-  void _constructorHelperMethod() async {
+  Future<bool> constructorHelperMethod() async {
     WidgetsFlutterBinding.ensureInitialized();
     _contactPuller = ContactPuller();
     _contactPuller.requestContactPermissions();
@@ -52,11 +51,13 @@ class CollaborationPage {
       _contactPermissionsEnabled = true;
       List<Contact> contacts = await _contactPuller.getContactsFromOS();
       _contactMap = ContactMap(contacts: contacts);
+      print("map initialized");
     } else {
       print("permission not granted");
       _contactPermissionsEnabled = false;
       _contactPuller.openSettings();
     }
+    return true;
   }
 
   /// Returns a [PageType] object representing the page that the user should

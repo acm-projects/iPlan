@@ -1,6 +1,6 @@
 # matthew_backend
 
-A Flutter project to experiment with Flutter/Dart's Contact Picker API
+Matthew's contributions to the backend of code for iPlan
 
 ## Getting Started
 

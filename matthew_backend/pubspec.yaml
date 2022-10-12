@@ -1,5 +1,5 @@
 name: matthew_backend
-description: A Flutter project to experiment with Flutter/Dart's Contact Picker API
+description: Matthew's contributions to the backend of code for iPlan
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -36,10 +36,8 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  contacts_service: ^0.6.3
-  collection: ^1.16.0
-  quiver: ^3.1.0
   permission_handler: ^10.1.0
+  contacts_service: ^0.6.3
 
 dev_dependencies:
   flutter_test:

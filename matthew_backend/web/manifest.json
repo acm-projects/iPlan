@@ -5,7 +5,7 @@
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A Flutter project to experiment with Flutter/Dart's Contact Picker API",
+    "description": "Matthew's contributions to the backend of code for iPlan",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

@@ -1,9 +1,12 @@
 import 'package:contacts_service/contacts_service.dart';
-import 'package:matthew_backend/Collaboration/collaboration_page.dart';
+import 'package:flutter/cupertino.dart';
+import 'Collaboration/collaboration_page.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   CollaborationPage collaborationPage =
       CollaborationPage(title: "Test Event", date: "October 12, 2022");
+  await collaborationPage.constructorHelperMethod();
   print("Title: ${collaborationPage.getTitle()}");
   print("Date: ${collaborationPage.getDate()}");
   print("Names that contain \"Sheldon\":\n"
