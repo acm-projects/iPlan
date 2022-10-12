@@ -1,7 +1,9 @@
 import 'null_parameter_exception.dart';
+/// TODO: implement the notion of accepting the invitation and denoting between
+/// invited collaborators and those who are actual collaborators.
 
 /// The [Collaborator] object represents the information for an individual collaborator.
-/// These forms of information include [name], [email], and [phoneNumber].
+/// These forms of information include [_name], [_email], and [_phoneNumber].
 class Collaborator {
   /// The name of the collaborator
   late String _name;
@@ -25,17 +27,17 @@ class Collaborator {
     }
   }
 
-  /// Returns the [name] of the [Collaborator] object
+  /// Returns the [_name] of the [Collaborator] object
   String getName() {
     return _name;
   }
 
-  /// Returns the [email] of the [Collaborator] object
+  /// Returns the [_email] of the [Collaborator] object
   String getEmail() {
     return _email;
   }
 
-  /// Returns the [phoneNumber] of the [Collaborator] object
+  /// Returns the [_phoneNumber] of the [Collaborator] object
   String getPhoneNumber() {
     return _phoneNumber;
   }

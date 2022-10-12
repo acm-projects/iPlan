@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.punchwood2003" "\0"
-            VALUE "FileDescription", "contact_picker_testing" "\0"
+            VALUE "FileDescription", "matthew_backend" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "contact_picker_testing" "\0"
+            VALUE "InternalName", "matthew_backend" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2022 com.punchwood2003. All rights reserved." "\0"
-            VALUE "OriginalFilename", "contact_picker_testing.exe" "\0"
-            VALUE "ProductName", "contact_picker_testing" "\0"
+            VALUE "OriginalFilename", "matthew_backend.exe" "\0"
+            VALUE "ProductName", "matthew_backend" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

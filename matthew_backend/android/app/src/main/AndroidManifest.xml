@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.punchwood2003.contact_picker_testing">
+    package="com.punchwood2003.matthew_backend">
    <application
-        android:label="contact_picker_testing"
+        android:label="matthew_backend"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

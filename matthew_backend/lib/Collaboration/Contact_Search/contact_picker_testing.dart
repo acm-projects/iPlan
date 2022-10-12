@@ -10,23 +10,22 @@ void main() async {
 
   print("Requesting permission for access to contacts\n");
   PermissionStatus? contactPermission = await Permission.contacts.status;
-  if(contactPermission!.isDenied){
+  if (contactPermission!.isDenied) {
     print("Contact permissions are required to use the collaboration feature. \nPlease allow contact permissions.");
     Map<Permission, PermissionStatus> status = await [Permission.contacts].request();
     contactPermission = status[Permission.contacts];
   }
 
   contactPermission = await Permission.contacts.status;
-  if(contactPermission!.isDenied) {
+  if (contactPermission!.isDenied) {
     print("In order to use the Collaborate feature of this app, please enable contact permissions");
     openAppSettings();
-  } else if(contactPermission!.isGranted) {
+  } else if (contactPermission!.isGranted) {
     print("Accessing all contacts on the current devide\n");
     List<Contact> contacts = await ContactsService.getContacts();
     print("Printing all contacts including name, email, and phone number\n");
     for (Contact curr in contacts) {
-      print("${curr.displayName}${curr.company == null ? "" : " (${curr
-          .company})"}:\n");
+      print("${curr.displayName}${curr.company == null ? "" : " (${curr.company})"}:\n");
       List<Item>? emails = curr.emails;
       if (emails!.isNotEmpty) {
         print("\tEmails:\n");
@@ -45,19 +44,9 @@ void main() async {
       if (addresses!.isNotEmpty) {
         print("\tAddresses:\n");
         for (int i = 0; i < addresses.length; i++) {
-          print("\t\t-> ${addresses[i].toString().trim().replaceAll(
-              "\n", " ")}\n");
+          print("\t\t-> ${addresses[i].toString().trim().replaceAll("\n", " ")}\n");
         }
       }
-      // Looks like the avatar parameter is just a list of the RGB values of each pixel... so totally useless
-      // Uint8List? pfp = curr.avatar;
-      // if(pfp!.isNotEmpty) {
-      //   print("\tAvatar:\n");
-      //   pfp.
-      //   for(int i = 0; i < pfp.length; i++) {
-      //     print("\t\t-> ${pfp[i].toString()}");
-      //   }
-      // }
     }
   }
 
