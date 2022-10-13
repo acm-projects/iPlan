@@ -41,9 +41,9 @@ void main() async {
   print(output);
 
   InviteCollaborator invite = InviteCollaborator();
-  invite.sendEmail(
-      email: "punchwood2003@gmail.com",
-      link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+  // invite.sendEmail(
+  //     email: "punchwood2003@gmail.com",
+  //     link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ");
   invite.sendSMS(
       phoneNumber: "4694307144",
       link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ");

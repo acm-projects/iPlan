@@ -5,8 +5,8 @@ import 'package:permission_handler/permission_handler.dart';
 import '../page_type.dart';
 import 'Contact_Search/contact_mapper.dart';
 import 'Contact_Search/contact_puller.dart';
-import 'collaborator.dart';
-import 'null_parameter_exception.dart';
+import 'Collaborator/collaborator.dart';
+import 'Collaborator/null_parameter_exception.dart';
 
 /// The [CollaborationPage] class implements the use of classes like [ContactMap]
 /// and [ContactPuller] to request contact permissions, retrieve contacts from the
