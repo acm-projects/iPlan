@@ -6,8 +6,15 @@ import '../page_type.dart';
 import 'Contact_Search/contact_mapper.dart';
 import 'Contact_Search/contact_puller.dart';
 import 'collaborator.dart';
+import 'null_parameter_exception.dart';
 
-///
+/// The [CollaborationPage] class implements the use of classes like [ContactMap]
+/// and [ContactPuller] to request contact permissions, retrieve contacts from the
+/// user's native OS contacts app, store and mannage current [Collaborator]
+/// objects, and search the user's contacts for people who's display names match
+/// or contain a certain substring.
+/// TODO: implement the link creation, compression, and expansion once other
+/// classes have been created.
 class CollaborationPage {
   /// The list of [Collaborator] objects for the current event
   late List<Collaborator> _collaborators;
@@ -42,18 +49,14 @@ class CollaborationPage {
   Future<bool> constructorHelperMethod() async {
     WidgetsFlutterBinding.ensureInitialized();
     _contactPuller = ContactPuller();
-    _contactPuller.requestContactPermissions();
+    await _contactPuller.requestContactPermissions();
     PermissionStatus permissionStatus =
         await _contactPuller.getCurrentContactPermissionStatus();
-    print(permissionStatus.isGranted);
     if (permissionStatus.isGranted) {
-      print("permission granted");
       _contactPermissionsEnabled = true;
       List<Contact> contacts = await _contactPuller.getContactsFromOS();
       _contactMap = ContactMap(contacts: contacts);
-      print("map initialized");
     } else {
-      print("permission not granted");
       _contactPermissionsEnabled = false;
       _contactPuller.openSettings();
     }
@@ -129,15 +132,32 @@ class CollaborationPage {
     return output;
   }
 
+  /// Given the passed paramater [contact], create and add a [Collaborator] object
+  /// to [_collaborators] using either the email or phone number denoted by the
+  /// value of the parameter [useEmail]. If the passed [contact] paramaeter does
+  /// not include the type of contact information denoted by [useEmail], then
+  /// [addCollaborator] will throw a [NullParameterException].
   void addCollaborator({required Contact contact, required bool useEmail}) {
     if (useEmail) {
       List<Item> emails = contact.emails!;
-      _collaborators.add(
-          Collaborator(name: contact.displayName!, email: emails[0].value!));
+      try {
+        _collaborators.add(
+            Collaborator(name: contact.displayName!, email: emails[0].value!));
+      } catch (e) {
+        print(
+            "Contact was attempted to be made with email, but no email exists for ${contact.displayName}'s contact.");
+        print(e);
+      }
     } else {
       List<Item> phoneNumbers = contact.phones!;
-      _collaborators.add(Collaborator(
-          name: contact.displayName!, phoneNumber: phoneNumbers[0].value!));
+      try {
+        _collaborators.add(Collaborator(
+            name: contact.displayName!, phoneNumber: phoneNumbers[0].value!));
+      } catch (e) {
+        print(
+            "Contact was attempted to be made with phone number, but no phone number exists for ${contact.displayName}'s contact.");
+        print(e);
+      }
     }
   }
 }

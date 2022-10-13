@@ -38,6 +38,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   permission_handler: ^10.1.0
   contacts_service: ^0.6.3
+  url_launcher: ^6.1.6
 
 dev_dependencies:
   flutter_test:
