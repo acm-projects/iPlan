@@ -34,103 +34,127 @@ class _CalendarState extends State<Calendar> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor: Color.fromRGBO(254, 247, 236, 1),
-      appBar: AppBar(
-        title: Text(
-          'Calendar',
-          style: GoogleFonts.lato(
-            textStyle: TextStyle(
-              color: Color.fromRGBO(254, 247, 236, 1),
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          textScaleFactor: 1.5,
-        ),
-        centerTitle: true,
-        backgroundColor: const Color.fromRGBO(101, 123, 227, 1),
-        elevation: 0,
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            TableCalendar(
-              focusedDay: selectedDay,
-              firstDay: DateTime(1990),
-              lastDay: DateTime(2050),
-
-              //calendar view changes
-              calendarFormat: format,
-              onFormatChanged: (CalendarFormat _format) {
-                setState(() {
-                  format = _format;
-                });
-              },
-
-              startingDayOfWeek: StartingDayOfWeek.sunday,
-              daysOfWeekVisible: true,
-
-              //day changes
-              onDaySelected: (DateTime selectDay, DateTime focusDay) {
-                setState(() {
-                  selectedDay = selectDay;
-                  focusedDay = focusDay;
-                });
-              },
-              selectedDayPredicate: (DateTime date) {
-                return isSameDay(selectedDay, date);
-              },
-
-              eventLoader: _getTasksfromDay,
-
-              //calendar style
-              calendarStyle: const CalendarStyle(
-                isTodayHighlighted: true,
-                selectedTextStyle: TextStyle(
-                  color: Colors.black,
-                ),
-                todayTextStyle: TextStyle(
-                  color: Colors.black,
-                ),
-                selectedDecoration: BoxDecoration(
-                  color: Color.fromRGBO(186, 227, 101, 1),
-                  shape: BoxShape.circle,
-                ),
-                todayDecoration: BoxDecoration(
-                  color: Color.fromRGBO(186, 227, 101, 0.5),
-                  shape: BoxShape.circle,
-                ),
-              ),
-              headerStyle: HeaderStyle(
-                titleCentered: false,
-                titleTextStyle: GoogleFonts.lato(),
-                formatButtonTextStyle: GoogleFonts.lato(),
-                formatButtonVisible: true,
-                formatButtonShowsNext: false,
-                formatButtonDecoration: BoxDecoration(
-                  color: const Color.fromRGBO(186, 227, 101, 1),
-                  borderRadius: BorderRadius.circular(5.0),
-                ),
-              ),
-            ),
-            Container(
-              alignment: Alignment.centerLeft,
-              padding: const EdgeInsets.all(15.0),
-              child: Text(
-                "Tasks to complete",
-                style: GoogleFonts.lato(
-                  textStyle: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Color(0xFF657BE3),
+      body: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(0.0, 50.0, 0.0, 5.0),
+            child: Center(
+              child: Text.rich(
+                TextSpan(
+                  text: 'Calendar',
+                  style: GoogleFonts.lato(
+                    textStyle: TextStyle(
+                      color: Color.fromRGBO(254, 247, 236, 1),
+                      fontSize: 50.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
             ),
-            ..._getTasksfromDay(selectedDay).map(
-                  (Task event) => listTileWidget(event),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(0.0, 9.0, 0.0, 0.0),
+            child: Container(
+              height: size.height - 184.0,
+              decoration: BoxDecoration(
+                color: Color(0xFFFEF7EC),
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(20.0),
+                  topRight: const Radius.circular(20.0),
+                ),
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    TableCalendar(
+                      rowHeight: 45.0,
+                      daysOfWeekHeight: 15.0,
+
+                      focusedDay: selectedDay,
+                      firstDay: DateTime(1990),
+                      lastDay: DateTime(2050),
+
+                      //calendar view changes
+                      calendarFormat: format,
+                      onFormatChanged: (CalendarFormat _format) {
+                        setState(() {
+                          format = _format;
+                        });
+                      },
+
+                      startingDayOfWeek: StartingDayOfWeek.sunday,
+                      daysOfWeekVisible: true,
+
+                      //day changes
+                      onDaySelected: (DateTime selectDay, DateTime focusDay) {
+                        setState(() {
+                          selectedDay = selectDay;
+                          focusedDay = focusDay;
+                        });
+                      },
+                      selectedDayPredicate: (DateTime date) {
+                        return isSameDay(selectedDay, date);
+                      },
+
+                      eventLoader: _getTasksfromDay,
+
+                      //calendar style
+                      calendarStyle: const CalendarStyle(
+                        isTodayHighlighted: true,
+                        selectedTextStyle: TextStyle(
+                          color: Colors.black,
+                        ),
+                        todayTextStyle: TextStyle(
+                          color: Colors.black,
+                        ),
+                        selectedDecoration: BoxDecoration(
+                          color: Color.fromRGBO(186, 227, 101, 1),
+                          shape: BoxShape.circle,
+                        ),
+                        todayDecoration: BoxDecoration(
+                          color: Color.fromRGBO(186, 227, 101, 0.5),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      headerStyle: HeaderStyle(
+                        titleCentered: false,
+                        titleTextStyle: GoogleFonts.lato(),
+                        formatButtonTextStyle: GoogleFonts.lato(),
+                        formatButtonVisible: true,
+                        formatButtonShowsNext: false,
+                        formatButtonDecoration: BoxDecoration(
+                          color: const Color.fromRGBO(186, 227, 101, 1),
+                          borderRadius: BorderRadius.circular(5.0),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      padding: const EdgeInsets.all(10.0),
+                      child: Text(
+                        "Tasks to complete",
+                        style: GoogleFonts.lato(
+                          textStyle: TextStyle(
+                            fontSize: 20.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    ..._getTasksfromDay(selectedDay).map(
+                          (Task event) => listTileWidget(event),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: (){
