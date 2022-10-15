@@ -6,7 +6,7 @@ class InviteCollaborator {
         scheme: "sms",
         path: phoneNumber,
         queryParameters: <String, String>{
-          'body': "You have been invited to an iPlan event.\n"
+          "body": "You have been invited to an iPlan event.\n"
             "Upon downloading the iPlan app, on the event organization screen,"
             "paste the following link to be added as a collaborator: $link"
         });

@@ -7,12 +7,12 @@ import 'package:contacts_service/contacts_service.dart';
 /// the list of contacts that are a part of the user's native OS contacts app.
 class ContactMap {
   /// The mapping of [String] names to [Contact] contacts.
-  late HashMap<String, Contact> _nameToContact;
+  late SplayTreeMap<String, Contact> _nameToContact;
 
   /// Constructs a [ContactMap] object with the required passed parameter [contacts]
   /// which are the list of [Contact] objects that the user wishes to query over.  
   ContactMap({required List<Contact> contacts}) {
-    _nameToContact = HashMap<String, Contact>();
+    _nameToContact = SplayTreeMap<String, Contact>();
     for (Contact contact in contacts) {
       _nameToContact["${contact.displayName}"] = contact;
     }

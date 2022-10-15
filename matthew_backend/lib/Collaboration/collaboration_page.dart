@@ -1,5 +1,4 @@
 import 'package:contacts_service/contacts_service.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../page_type.dart';
@@ -19,13 +18,16 @@ class CollaborationPage {
   /// The list of [Collaborator] objects for the current event
   late List<Collaborator> _collaborators;
 
+  /// The list of [Contact] objects for the current user
+  late List<Contact> _contacts;
+
   /// The mapping between names of contacts and [Contact] objects
   late ContactMap _contactMap;
 
   /// The tool used to request contact permissions and scrape the user's contacts
   late ContactPuller _contactPuller;
 
-  /// The invite link that can be sent to users to allow them to collaborate as well
+  /// The invite link that can be sent to users to allow them to collaborate
   late String _inviteLink;
 
   /// The title of the event
@@ -34,6 +36,8 @@ class CollaborationPage {
   /// The date of the event
   late String _date;
 
+  /// Whether or not the user has enables contact permissions. This will
+  /// drastically change the behavior of the page if they are turned off.
   late bool _contactPermissionsEnabled;
 
   /// Creates a [CollaborationPage] object with the passed [title] and [date]
@@ -47,15 +51,14 @@ class CollaborationPage {
   /// asynchronous methods and constructor conflicts. Finished initializing
   /// the [ContactPuller] and [ContactMap] objects.
   Future<bool> constructorHelperMethod() async {
-    WidgetsFlutterBinding.ensureInitialized();
     _contactPuller = ContactPuller();
     await _contactPuller.requestContactPermissions();
     PermissionStatus permissionStatus =
         await _contactPuller.getCurrentContactPermissionStatus();
     if (permissionStatus.isGranted) {
       _contactPermissionsEnabled = true;
-      List<Contact> contacts = await _contactPuller.getContactsFromOS();
-      _contactMap = ContactMap(contacts: contacts);
+      _contacts = await _contactPuller.getContactsFromOS();
+      _contactMap = ContactMap(contacts: _contacts);
     } else {
       _contactPermissionsEnabled = false;
       _contactPuller.openSettings();
@@ -92,23 +95,22 @@ class CollaborationPage {
   /// Returns a list of the current people who have either been invited to
   /// collaborate or are active collaborators.
   List<Collaborator> getCollaborators() {
-    return _collaborators;
+    return _contactPermissionsEnabled ? _collaborators : <Collaborator>[];
   }
 
   /// Returns a list of names that match the [substring] parameter.
-  Future<List<String>> getNamesFromSearch({required String substring}) async {
-    if (await _contactPuller.getCurrentContactPermissionStatus().isGranted) {
-      return _contactMap.getNamesThatContain(substring: substring);
-    } else {
-      return <String>[];
-    }
+  List<String> getNamesFromSearch({required String substring}) {
+    return _contactPermissionsEnabled
+        ? _contactMap.getNamesThatContain(substring: substring)
+        : <String>[];
   }
 
   /// Returns a list of Contacts that match the [substring] parameter.
-  Future<List<Contact>> getContactsFromSearch(
-      {required String substring}) async {
-    return _contactMap.getContactsFromNames(
-        names: await getNamesFromSearch(substring: substring));
+  List<Contact> getContactsFromSearch({required String substring}) {
+    return _contactPermissionsEnabled
+        ? _contactMap.getContactsFromNames(
+            names: getNamesFromSearch(substring: substring))
+        : <Contact>[];
   }
 
   /// Returns a [String] representation of the passed [contact] parameter
@@ -144,8 +146,8 @@ class CollaborationPage {
         _collaborators.add(
             Collaborator(name: contact.displayName!, email: emails[0].value!));
       } catch (e) {
-        print(
-            "Contact was attempted to be made with email, but no email exists for ${contact.displayName}'s contact.");
+        print("Contact was attempted to be made with email, "
+            "but no email exists for ${contact.displayName}'s contact.");
         print(e);
       }
     } else {
@@ -154,8 +156,8 @@ class CollaborationPage {
         _collaborators.add(Collaborator(
             name: contact.displayName!, phoneNumber: phoneNumbers[0].value!));
       } catch (e) {
-        print(
-            "Contact was attempted to be made with phone number, but no phone number exists for ${contact.displayName}'s contact.");
+        print("Contact was attempted to be made with phone number, "
+            "but no phone number exists for ${contact.displayName}'s contact.");
         print(e);
       }
     }
