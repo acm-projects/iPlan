@@ -1,3 +1,4 @@
+/// @author [MatthewSheldon]
 /// The [Expense] object represents an individual expense contained
 /// within a [FinanceCategory] object
 class Expense {

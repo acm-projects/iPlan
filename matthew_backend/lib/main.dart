@@ -3,10 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:matthew_backend/Collaboration/Invite_Collaborator/invite_collaborator.dart';
 import 'package:matthew_backend/Collaboration/collaboration_page.dart';
 
+import 'Collaboration/Collaborator/collaborator.dart';
+
 void main() async {
   CollaborationPage collaborationPage =
       CollaborationPage(title: "Event Name", date: "April 25, 2022");
   await collaborationPage.constructorHelperMethod();
+  Contact matthew =
+      collaborationPage.getContactsFromSearch(substring: "Matthew Sheldon")[0];
+  print(collaborationPage.contactToString(contact: matthew));
+  collaborationPage.addCollaborator(
+      contact: matthew, useEmail: true, hasAccepted: true);
+  Contact veda = collaborationPage.getContactsFromSearch(substring: "Veda")[0];
+  collaborationPage.addCollaborator(
+      contact: veda, useEmail: false, hasAccepted: true);
+  Contact casi = collaborationPage.getContactsFromSearch(substring: "Casi")[0];
+  collaborationPage.addCollaborator(
+      contact: casi, useEmail: false, hasAccepted: false);
   InviteCollaborator inviteCollaborator = InviteCollaborator();
   TextEditingController searchBarTextRetrieval = TextEditingController();
   runApp(MyApp(
@@ -47,35 +60,36 @@ class WhiteSquare extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String substring = searchBarTextRetrieval.text;
-    print("Substring: $substring");
-    List<Contact> contactsContainSubstring =
-        collaborationPage.getContactsFromSearch(substring: substring);
-
+    List<Collaborator> collaborators = collaborationPage.getCollaborators();
+    collaborators.sort();
     List<ListTile> contactsToDisplay = <ListTile>[];
-    for (Contact contact in contactsContainSubstring) {
+    for (Collaborator collaborator in collaborators) {
       String contactInformation = "";
-      if (contact.emails!.isNotEmpty) {
-        contactInformation = contact.emails![0].value!;
-      } else if (contact.phones!.isNotEmpty) {
-        contactInformation = contact.phones![0].value!;
+      if (collaborator.getEmail() != "null") {
+        contactInformation = collaborator.getEmail();
+      } else if (collaborator.getPhoneNumber() != "null") {
+        contactInformation = collaborator.getPhoneNumber();
       }
+
+      Widget trailing = collaborator.hasAccepted()
+          ? Text("Collaborator")
+          : Wrap(
+              spacing: 2,
+              children: const <Widget>[
+                Icon(Icons.check, color: Colors.black, size: 17),
+                Text("Invited"),
+              ],
+            );
+
       contactsToDisplay.add(ListTile(
-        contentPadding: EdgeInsets.symmetric(horizontal: 40.0),
-        leading: CircleAvatar(
-            radius: 20,
-            backgroundColor: Colors.grey,
-            child: Icon(Icons.person, color: Color(0xFFFEF7EC))),
-        title: Text("${contact.displayName}"),
-        subtitle: Text("$contactInformation"),
-        trailing: Wrap(
-          spacing: 2,
-          children: const <Widget>[
-            Icon(Icons.check, color: Colors.black, size: 17),
-            Text("Invited"),
-          ],
-        ),
-      ));
+          contentPadding: EdgeInsets.symmetric(horizontal: 40.0),
+          leading: CircleAvatar(
+              radius: 20,
+              backgroundColor: Colors.grey,
+              child: Icon(Icons.person, color: Color(0xFFFEF7EC))),
+          title: Text("${collaborator.getName()}"),
+          subtitle: Text("$contactInformation"),
+          trailing: trailing));
     }
 
     return Container(

@@ -1,11 +1,9 @@
 import 'null_parameter_exception.dart';
 
-/// TODO: implement the notion of accepting the invitation and denoting between
-/// invited collaborators and those who are actual collaborators.
-
+/// @author [MatthewSheldon]
 /// The [Collaborator] object represents the information for an individual collaborator.
 /// These forms of information include [_name], [_email], and [_phoneNumber].
-class Collaborator {
+class Collaborator implements Comparable<Collaborator> {
   /// The name of the collaborator
   late String _name;
 
@@ -24,17 +22,17 @@ class Collaborator {
   /// or [phoneNumber] are not passed, assume them to be ["null"]. If both
   /// [email] and [phoneNumber] are not passed, then a [NullParameterException]
   /// will be thrown and prevent the creation of the [Collaborator] object.
-  Collaborator(
-      {required String name,
+  Collaborator({required String name,
       String email = "null",
-      String phoneNumber = "null"}) {
+      String phoneNumber = "null",
+      required bool hasAccepted}) {
     if (email == "null" && phoneNumber == "null") {
       throw NullParameterException();
     } else {
       _name = name;
       _email = email;
       _phoneNumber = phoneNumber;
-      _hasAccepted = false;
+      _hasAccepted = hasAccepted;
     }
   }
 
@@ -53,17 +51,30 @@ class Collaborator {
     return _phoneNumber;
   }
 
-  void acceptInvitation() {
-    _hasAccepted = true;
+  /// Returns whether or not the [Collaborator] has accepte the invitation
+  bool hasAccepted() {
+    return _hasAccepted;
   }
 
-  
   /// Represents the current [Collaborator] class as the required name parameter,
   /// and the optional email and
   @override
   String toString() {
     return "Name: $_name\n"
-        "${_email == "null" ? "" : "Email: $_email"}\n"
+        "${_email == null ? "" : "Email: $_email"}\n"
         "${_phoneNumber == "null" ? "" : "Phone Number: $_phoneNumber"}\n";
+  }
+
+  /// Sort first by whether or not the user has accepted the collaboration
+  /// invitation denoted by [_hasAccepted], and then by alphabetical order 
+  /// denoted by [_name].
+  @override
+  int compareTo(Collaborator other) {
+    if (this._hasAccepted == other._hasAccepted) {
+      return this._name.compareTo(other._name);
+    } else if (this._hasAccepted) {
+      return -1;
+    }
+    return 1;
   }
 }

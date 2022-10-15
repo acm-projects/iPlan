@@ -41,6 +41,7 @@ dependencies:
   url_launcher: ^6.1.6
   google_fonts: ^3.0.1
   table_calendar: ^3.0.7
+  dropdownfield: ^1.0.3
 
 dev_dependencies:
   flutter_test:

@@ -1,3 +1,4 @@
+/// @author [MatthewSheldon]
 /// An Exception that handles the edge case of both the [email] and [phoneNumber]
 /// parameters of a [Collaborator] object being null.
 class NullParameterException implements Exception {

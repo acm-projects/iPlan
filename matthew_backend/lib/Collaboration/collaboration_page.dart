@@ -7,6 +7,7 @@ import 'Contact_Search/contact_puller.dart';
 import 'Collaborator/collaborator.dart';
 import 'Collaborator/null_parameter_exception.dart';
 
+/// @author [MatthewSheldon]
 /// The [CollaborationPage] class implements the use of classes like [ContactMap]
 /// and [ContactPuller] to request contact permissions, retrieve contacts from the
 /// user's native OS contacts app, store and mannage current [Collaborator]
@@ -36,7 +37,7 @@ class CollaborationPage {
   /// The date of the event
   late String _date;
 
-  /// Whether or not the user has enables contact permissions. This will
+  /// Whether or not the user has enabled contact permissions. This will
   /// drastically change the behavior of the page if they are turned off.
   late bool _contactPermissionsEnabled;
 
@@ -45,6 +46,7 @@ class CollaborationPage {
   CollaborationPage({required String title, required String date}) {
     _title = title;
     _date = date;
+    _collaborators = <Collaborator>[];
   }
 
   /// Used by the [CollaborationPage] constructor to mitigate the issue of
@@ -55,6 +57,7 @@ class CollaborationPage {
     await _contactPuller.requestContactPermissions();
     PermissionStatus permissionStatus =
         await _contactPuller.getCurrentContactPermissionStatus();
+        
     if (permissionStatus.isGranted) {
       _contactPermissionsEnabled = true;
       _contacts = await _contactPuller.getContactsFromOS();
@@ -139,14 +142,19 @@ class CollaborationPage {
   /// value of the parameter [useEmail]. If the passed [contact] paramaeter does
   /// not include the type of contact information denoted by [useEmail], then
   /// [addCollaborator] will throw a [NullParameterException].
-  void addCollaborator({required Contact contact, required bool useEmail}) {
+  void addCollaborator(
+      {required Contact contact,
+      required bool useEmail,
+      required bool hasAccepted}) {
     if (useEmail) {
       List<Item> emails = contact.emails!;
       try {
-        _collaborators.add(
-            Collaborator(name: contact.displayName!, email: emails[0].value!));
+        _collaborators.add(Collaborator(
+            name: contact.displayName!,
+            email: emails[0].value!,
+            hasAccepted: hasAccepted));
       } catch (e) {
-        print("Contact was attempted to be made with email, "
+        print("Collaborator was attempted to be made with email, "
             "but no email exists for ${contact.displayName}'s contact.");
         print(e);
       }
@@ -154,9 +162,11 @@ class CollaborationPage {
       List<Item> phoneNumbers = contact.phones!;
       try {
         _collaborators.add(Collaborator(
-            name: contact.displayName!, phoneNumber: phoneNumbers[0].value!));
+            name: contact.displayName!,
+            phoneNumber: phoneNumbers[0].value!,
+            hasAccepted: hasAccepted));
       } catch (e) {
-        print("Contact was attempted to be made with phone number, "
+        print("Collaborator was attempted to be made with phone number, "
             "but no phone number exists for ${contact.displayName}'s contact.");
         print(e);
       }

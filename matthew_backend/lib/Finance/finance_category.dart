@@ -1,5 +1,6 @@
 import 'expense.dart';
 
+/// @author [MatthewSheldon]
 /// The [FinanceCategory] object represents an entire group of Expense objects
 /// with a common theme. This is used in tandem with the [FinancePage] class.
 class FinanceCategory {
