@@ -9,16 +9,19 @@ class Calendar extends StatefulWidget {
 }
 
 class _CalendarState extends State<Calendar> {
+  //map with date as key and list of tasks on that date as value
   late Map<DateTime, List<Task>> selectedTasks;
+  //calendar format is calendar view (month, two weeks, week)
   CalendarFormat format = CalendarFormat.month;
   DateTime selectedDay = DateTime.now();
   DateTime focusedDay = DateTime.now();
 
   TextEditingController _taskController = TextEditingController();
+  TextEditingController _timeController = TextEditingController();
 
   @override
   void initState() {
-    selectedTasks = {};
+    selectedTasks = {}; //initializes selectedTasks to nothing
     super.initState();
   }
 
@@ -29,6 +32,7 @@ class _CalendarState extends State<Calendar> {
   @override
   void dispose() {
     _taskController.dispose();
+    _timeController.dispose();
     super.dispose();
   }
 
@@ -40,6 +44,7 @@ class _CalendarState extends State<Calendar> {
       backgroundColor: Color(0xFF657BE3),
       body: Column(
         children: [
+          //title of page
           Padding(
             padding: EdgeInsets.fromLTRB(0.0, 50.0, 0.0, 5.0),
             child: Center(
@@ -103,7 +108,7 @@ class _CalendarState extends State<Calendar> {
 
                       eventLoader: _getTasksfromDay,
 
-                      //calendar style
+                      //aesthetics
                       calendarStyle: const CalendarStyle(
                         isTodayHighlighted: true,
                         selectedTextStyle: TextStyle(
@@ -146,9 +151,11 @@ class _CalendarState extends State<Calendar> {
                         ),
                       ),
                     ),
+                    //click on a new day, returns a list of tasks for that day
                     ..._getTasksfromDay(selectedDay).map(
                           (Task event) => listTileWidget(event),
                     ),
+                    SizedBox(height: 80),
                   ],
                 ),
               ),
@@ -156,6 +163,7 @@ class _CalendarState extends State<Calendar> {
           ),
         ],
       ),
+      //button to add new task
       floatingActionButton: FloatingActionButton.extended(
         onPressed: (){
           showModalBottomSheet(
@@ -188,7 +196,11 @@ class _CalendarState extends State<Calendar> {
                                 Icons.close,
                               ),
                               color: Color.fromRGBO(186, 227, 101, 1),
-                              onPressed: () => Navigator.pop(context),
+                              onPressed: (){
+                                _taskController.clear();
+                                _timeController.clear();
+                                Navigator.pop(context);
+                              },
                             ),
                             SizedBox(height: 10),
                             Text(
@@ -213,37 +225,72 @@ class _CalendarState extends State<Calendar> {
                                 } else {
                                   if (selectedTasks[selectedDay] != null) {
                                     selectedTasks[selectedDay]?.add(
-                                      Task(title: _taskController.text, day: selectedDay),
+                                      Task(title: _taskController.text, day: selectedDay, time: _timeController.text),
                                     );
                                   } else {
                                     selectedTasks[selectedDay] = [
-                                      Task(title: _taskController.text, day: selectedDay)
+                                      Task(title: _taskController.text, day: selectedDay, time: _timeController.text),
                                     ];
                                   }
                                 }
                                 Navigator.pop(context);
                                 _taskController.clear();
+                                _timeController.clear();
                                 setState((){});
                                 return;
                               },
                             ),
                           ],
                         ),
-                        SizedBox(height: 15),
-                        TextField(
-                          style: GoogleFonts.lato(
+                        SizedBox(height: 25),
+                        //task name
+                        Container(
+                          decoration: BoxDecoration(
                             color: Color.fromRGBO(254, 247, 236, 1),
+                            borderRadius: BorderRadius.circular(20),
                           ),
-                          autofocus: true,
-                          textAlign: TextAlign.center,
-                          controller: _taskController,
-                          cursorColor: Color.fromRGBO(254, 247, 236, 1),
-                          decoration: InputDecoration(
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color.fromRGBO(254, 247, 236, 1)),
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 10.0),
+                            child: TextField(
+                              controller: _taskController,
+                              style: GoogleFonts.lato(
+                                color: Colors.black,
+                              ),
+                              cursorColor: Colors.black,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: 'Task Name',
+                                prefixIcon: Icon(
+                                  Icons.task,
+                                  color: Color(0xFF657BE3),
+                                ),
+                              ),
                             ),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color.fromRGBO(254, 247, 236, 1)),
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        //task name
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Color.fromRGBO(254, 247, 236, 1),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 10.0),
+                            child: TextField(
+                              controller: _timeController,
+                              style: GoogleFonts.lato(
+                                color: Colors.black,
+                              ),
+                              cursorColor: Colors.black,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: 'Due Time',
+                                prefixIcon: Icon(
+                                  Icons.access_alarm,
+                                  color: Color(0xFF657BE3),
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -285,7 +332,7 @@ class _CalendarState extends State<Calendar> {
       activeColor: Color.fromRGBO(186, 227, 101, 1),
       checkColor: Colors.black,
       title: Text(
-        event.title,
+        event.time + "          " + event.title,
         style: GoogleFonts.lato(
             decoration: event.isComplete
                 ? TextDecoration.lineThrough
