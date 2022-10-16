@@ -1,4 +1,4 @@
-import 'task.dart';
+import 'helpers/task.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,8 +13,8 @@ class _CalendarState extends State<Calendar> {
   late Map<DateTime, List<Task>> selectedTasks;
   //calendar format is calendar view (month, two weeks, week)
   CalendarFormat format = CalendarFormat.month;
-  DateTime selectedDay = DateTime.now();
-  DateTime focusedDay = DateTime.now();
+  DateTime selectedDay = DateTime.parse((DateTime.now().toString()).substring(0, 10) + " 00:00:00.000Z");
+  DateTime focusedDay = DateTime.parse((DateTime.now().toString()).substring(0, 10) + " 00:00:00.000Z");
 
   TextEditingController _taskController = TextEditingController();
   TextEditingController _timeController = TextEditingController();
@@ -26,7 +26,8 @@ class _CalendarState extends State<Calendar> {
   }
 
   List<Task> _getTasksfromDay(DateTime date) {
-    return selectedTasks[date] ?? [];
+    String strManip = (date.toString()).substring(0, 10) + " 00:00:00.000Z";
+    return selectedTasks[DateTime.parse(strManip)] ?? [];
   }
 
   @override
