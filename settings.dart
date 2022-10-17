@@ -1,3 +1,16 @@
+/*
+Notes:
+Can change user's name and/or password if "confirm" text field matches current password
+Only changes value if not empty (i.e. can change name w/o changing password, vv)
+Page automatically updates with new name/password upon clicking save
+
+TODO: Notification functionality (stretch goal)
+
+Backend:
+store and retrieve user info
+ */
+
+//can be replaced with backend user class, requires name/email/password
 import 'helpers/user.dart';
 
 import 'package:flutter/material.dart';
@@ -9,7 +22,10 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
+  //initializes user for testing purposes only
   User testUser = new User(name: "Jon", email: "jon@gmail.com", password: "iplan");
+
+  //TODO: saving state of notifications switch
   bool isSwitched = false;
 
   //text controllers
@@ -30,10 +46,16 @@ class _SettingsState extends State<Settings> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
-    Future updateInfo() async{  //for backend, text for email/password
-      //name: _nameController.text.trim(),
-      //password: _passwordController.text.trim(),
-      //confPassword: _passwordController.text.trim(),
+    //TODO: for backend, update user info
+    Future updateInfo() async{
+      if (_confPasswordController.text.trim() == testUser.password){
+        if(_nameController.text.isNotEmpty){
+          testUser.name = _nameController.text.trim();
+        }
+        if(_passwordController.text.isNotEmpty){
+          testUser.password = _passwordController.text.trim();
+        }
+      }
     }
 
     return Scaffold(
@@ -136,14 +158,12 @@ class _SettingsState extends State<Settings> {
                           ),
                           ElevatedButton(
                             onPressed: () {
-                              //DO SOMETHING HERE FIRST TO SAVE INFO?
-                              //email: _emailController.text.trim(),
-                              //password: _passwordController.text.trim(),
-
+                              updateInfo();
                               _nameController.clear();
                               _passwordController.clear();
                               _confPasswordController.clear();
-                            }, //TODO
+                              setState((){});
+                            },
                             style: ButtonStyle(
                               padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 50)),
                               shape: MaterialStateProperty.all(RoundedRectangleBorder(
@@ -212,7 +232,8 @@ class _SettingsState extends State<Settings> {
                       padding: EdgeInsets.symmetric(horizontal: 175.0),
                       width: 50.0,
                       child: FloatingActionButton(
-                        onPressed: () => print("reroute to beginning screen"),
+                        //TODO: reroute to welcome screen
+                        onPressed: () => print("Do Something"),
                         elevation: 5,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(25),

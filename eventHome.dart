@@ -1,3 +1,12 @@
+/*
+Notes:
+Can scroll to 2 days prior to current day + 500 days after
+
+Backend:
+store and retrieve selectedTasks (map of DateTime and Task<List>)
+order tasks from earliest time to latest time in selectedTasks
+ */
+
 import 'package:intl/intl.dart';
 
 import 'helpers/event.dart';
@@ -13,17 +22,31 @@ class EventHome extends StatefulWidget {
 }
 
 class _EventHomeState extends State<EventHome> {
+  //selectedTasks maps a date to a list of tasks on that date (same as calendar)
+  //initializes selectedTasks for testing purposes only
+  //TODO: change to Map<DateTime, List<Task>> selectedTasks;
   Map<DateTime, List<Task>> selectedTasks = {
-    DateTime.utc(2022, DateTime.october, 15): [Task(title: "Cater", day: DateTime.utc(2022, DateTime.october, 17), time: "9:00am"), Task(title: "RSVP", day: DateTime.utc(2022, DateTime.october, 17), time: "5:00pm")],
-    DateTime.utc(2022, DateTime.october, 17): [Task(title: "Cater", day: DateTime.utc(2022, DateTime.october, 17), time: "9:00am"), Task(title: "RSVP", day: DateTime.utc(2022, DateTime.october, 17), time: "8:00pm")],
-  }; //same selectedTasks as calendar
+    DateTime.utc(2022, DateTime.october, 15): [Task(title: "Cater", day: DateTime.utc(2022, DateTime.october, 17), time: TimeOfDay(hour: 8, minute: 0)), Task(title: "RSVP", day: DateTime.utc(2022, DateTime.october, 17), time: TimeOfDay(hour: 0, minute: 0))],
+    DateTime.utc(2022, DateTime.october, 17): [Task(title: "Cater", day: DateTime.utc(2022, DateTime.october, 17), time: TimeOfDay(hour: 0, minute: 0)), Task(title: "RSVP", day: DateTime.utc(2022, DateTime.october, 17), time: TimeOfDay(hour: 3, minute: 20))],
+  };
 
+  //initializes event for testing purposes only
+  //TODO: change to pull event info from backend
   Event example = Event(title: "Staff Beach Party", day: DateTime.now());
 
   DatePickerController _controller = DatePickerController();
+  //selected date
   DateTime _selectedValue = DateTime.now();
 
+  @override
+  void initState() {
+    //TODO: initialize selectedTasks to user's selectedTasks (same as calendar)
+    super.initState();
+  }
+
+  //returns list of tasks given date
   List<Task> _getTasksfromDay(DateTime date) {
+    //manipulates dateTime because of formatting issues
     String strManip = (date.toString()).substring(0, 10) + " 00:00:00.000Z";
     return selectedTasks[DateTime.parse(strManip)] ?? [];
   }
@@ -36,6 +59,7 @@ class _EventHomeState extends State<EventHome> {
       backgroundColor: Color(0xFF657BE3),
       body: Column(
         children: [
+          //displays title of event
           Padding(
             padding: EdgeInsets.fromLTRB(0.0, 50.0, 0.0, 5.0),
             child: Center(
@@ -65,10 +89,10 @@ class _EventHomeState extends State<EventHome> {
                     topRight: const Radius.circular(20.0),
                   ),
                 ),
-                //calendar button
                 child: ListView(
                   children: [
                     SizedBox(height: 30),
+                    //displays date of event
                     Center(
                       child: Text(
                         DateFormat.MMMM().format(example.day) + DateFormat(' dd, yyyy').format(example.day),
@@ -82,12 +106,13 @@ class _EventHomeState extends State<EventHome> {
                       ),
                     ),
                     SizedBox(height: 20),
+                    //calendar button
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 40.0),
                       height: 50.0,
                       width: double.infinity,
                       child: ElevatedButton.icon(
-                        onPressed: (){}, //TODO, reroute to calendar page
+                        onPressed: (){}, //TODO: reroute to calendar page
                         icon: Icon(
                           color: Colors.black,
                           Icons.calendar_month
@@ -114,6 +139,7 @@ class _EventHomeState extends State<EventHome> {
                     SizedBox(height: 30),
                     calendarView(),
                     SizedBox(height: 20),
+                    //tasks to complete text
                     Container(
                       alignment: Alignment.center,
                       padding: const EdgeInsets.all(10.0),
@@ -127,6 +153,7 @@ class _EventHomeState extends State<EventHome> {
                         ),
                       ),
                     ),
+                    //displays list of tasks for selected day
                     ..._getTasksfromDay(_selectedValue).map(
                       (Task task) {
                         return listTileWidget(task);
@@ -139,7 +166,7 @@ class _EventHomeState extends State<EventHome> {
           ),
         ],
       ),
-      //Navigation Bar with Icons
+      //navigation Bar with Icons
       bottomNavigationBar: BottomNavigationBar(
           showSelectedLabels: false,
           showUnselectedLabels: false,
@@ -160,6 +187,7 @@ class _EventHomeState extends State<EventHome> {
   Widget calendarView() {
     return Container(
       child: DatePicker(
+        //first day available to access
         DateTime.now().subtract(const Duration(days: 2)),
         width: 60,
         height: 80,
@@ -185,14 +213,14 @@ class _EventHomeState extends State<EventHome> {
     );
   }
 
-  //displays of tasks, same as calendarPage
+  //displays task with checkbox
   Widget listTileWidget(Task task){
     return Positioned(
       child: CheckboxListTile(
         activeColor: Color.fromRGBO(186, 227, 101, 1),
         checkColor: Colors.black,
         title: Text(
-          task.time + "          " + task.title,
+          "${task.time.format(context)}".padRight(25) + "${task.title}",
           style: GoogleFonts.lato(
               decoration: task.isComplete
                   ? TextDecoration.lineThrough

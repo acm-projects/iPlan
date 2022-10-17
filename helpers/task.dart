@@ -1,8 +1,10 @@
+import 'package:flutter/material.dart';
+
 class Task {
   String title;
   bool isComplete = false;
   DateTime day;
-  String time;
+  TimeOfDay time;
 
   Task({required this.title, required this.day, required this.time});
 

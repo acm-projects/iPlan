@@ -1,3 +1,7 @@
+/*
+line 53, text for email
+ */
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -50,7 +54,8 @@ class _forgotPassState extends State<forgotPass> {
 
   @override
   Widget build(BuildContext context) {
-    Future signIn() async{  //for backend, text for email
+    //TODO: for backend, email text
+    Future signIn() async{
       //email: _emailController.text.trim(),
     }
 
@@ -119,6 +124,9 @@ class _forgotPassState extends State<forgotPass> {
                               ),
                             ),
                             TextButton(
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                              ),
                               onPressed: () => print("Reroute to sign in page"),
                               child: Text(
                                 'Sign in now!',

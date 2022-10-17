@@ -1,3 +1,7 @@
+/*
+Line 109, has backend info
+ */
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -73,6 +77,9 @@ Widget forgotPassword(){
   return Container(
     alignment: Alignment.center,
     child: TextButton(
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all(Colors.transparent),
+      ),
       onPressed: () => print("Forgot Password"),
       child: Text(
         'Forgot password?',
@@ -101,7 +108,8 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
-    Future signIn() async{  //for backend, text for email/password
+    //TODO: for backend, text for email/password
+    Future signIn() async{
       //email: _emailController.text.trim(),
       //password: _passwordController.text.trim(),
     }
@@ -180,6 +188,9 @@ class _LoginState extends State<Login> {
                               ),
                             ),
                             TextButton(
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                              ),
                               onPressed: () => print("Reroute to sign up page"),
                               child: Text(
                                 'Sign up now!',

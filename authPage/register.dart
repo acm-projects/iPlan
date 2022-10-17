@@ -1,3 +1,7 @@
+/*
+Line 152, has backend info
+ */
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -149,7 +153,8 @@ class _RegisterState extends State<Register> {
 
   @override
   Widget build(BuildContext context) {
-    Future signUp() async{  //for backend, text for name/email/password
+    //TODO: for backend, text for name/email/password
+    Future signUp() async{
       //name: _nameController.text.trim(),
       //email: _emailController.text.trim(),
       //password: _passwordController.text.trim(),
@@ -231,6 +236,9 @@ class _RegisterState extends State<Register> {
                               ),
                             ),
                             TextButton(
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                              ),
                               onPressed: () => print("Reroute to login page"),
                               child: Text(
                                 'Login now!',

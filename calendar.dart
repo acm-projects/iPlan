@@ -1,4 +1,17 @@
+/*
+Notes:
+BUGFIX: Can now add tasks on initial load screen
+
+TODO: remove dot markers when task isComplete
+
+Backend:
+store and retrieve selectedTasks (map of DateTime and Task<List>)
+order tasks from earliest time to latest time in selectedTasks
+ */
+
+//can be replaced with backend task class, requires title, day, time, isComplete
 import 'helpers/task.dart';
+
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -17,7 +30,7 @@ class _CalendarState extends State<Calendar> {
   DateTime focusedDay = DateTime.parse((DateTime.now().toString()).substring(0, 10) + " 00:00:00.000Z");
 
   TextEditingController _taskController = TextEditingController();
-  TextEditingController _timeController = TextEditingController();
+  TimeOfDay _timeController = TimeOfDay(hour: 0, minute: 0);
 
   @override
   void initState() {
@@ -33,12 +46,12 @@ class _CalendarState extends State<Calendar> {
   @override
   void dispose() {
     _taskController.dispose();
-    _timeController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    _timeController = TimeOfDay(hour: 0, minute: 0);
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -199,7 +212,6 @@ class _CalendarState extends State<Calendar> {
                               color: Color.fromRGBO(186, 227, 101, 1),
                               onPressed: (){
                                 _taskController.clear();
-                                _timeController.clear();
                                 Navigator.pop(context);
                               },
                             ),
@@ -221,22 +233,21 @@ class _CalendarState extends State<Calendar> {
                               ),
                               color: Color.fromRGBO(186, 227, 101, 1),
                               onPressed: () {
-                                if (_taskController.text.isEmpty) {
+                                if (_taskController.text.isEmpty || _timeController == null) {
 
                                 } else {
                                   if (selectedTasks[selectedDay] != null) {
                                     selectedTasks[selectedDay]?.add(
-                                      Task(title: _taskController.text, day: selectedDay, time: _timeController.text),
+                                      Task(title: _taskController.text, day: selectedDay, time: _timeController),
                                     );
                                   } else {
                                     selectedTasks[selectedDay] = [
-                                      Task(title: _taskController.text, day: selectedDay, time: _timeController.text),
+                                      Task(title: _taskController.text, day: selectedDay, time: _timeController),
                                     ];
                                   }
                                 }
                                 Navigator.pop(context);
                                 _taskController.clear();
-                                _timeController.clear();
                                 setState((){});
                                 return;
                               },
@@ -276,23 +287,27 @@ class _CalendarState extends State<Calendar> {
                             color: Color.fromRGBO(254, 247, 236, 1),
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 10.0),
-                            child: TextField(
-                              controller: _timeController,
+                          child: TextButton(
+                            child: Text(
+                              'Select Time',
                               style: GoogleFonts.lato(
+                                fontSize: 15.0,
                                 color: Colors.black,
                               ),
-                              cursorColor: Colors.black,
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                hintText: 'Due Time',
-                                prefixIcon: Icon(
-                                  Icons.access_alarm,
-                                  color: Color(0xFF657BE3),
-                                ),
-                              ),
                             ),
+                            style: ButtonStyle(
+                              padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 20, vertical: 15)),
+                              shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              )),
+                              backgroundColor: MaterialStateProperty.all(Color(0xFFBAE365)),
+                            ),
+                            onPressed: () async{
+                              _timeController = (await showTimePicker(
+                                context: context,
+                                initialTime: TimeOfDay.now(),
+                              ))!;
+                            },
                           ),
                         ),
                       ],
@@ -333,7 +348,7 @@ class _CalendarState extends State<Calendar> {
       activeColor: Color.fromRGBO(186, 227, 101, 1),
       checkColor: Colors.black,
       title: Text(
-        event.time + "          " + event.title,
+        "${event.time.format(context)}".padRight(25) + "${event.title}",
         style: GoogleFonts.lato(
             decoration: event.isComplete
                 ? TextDecoration.lineThrough
