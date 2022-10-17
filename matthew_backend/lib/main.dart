@@ -2,6 +2,7 @@ import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:matthew_backend/Collaboration/Invite_Collaborator/invite_collaborator.dart';
 import 'package:matthew_backend/Collaboration/collaboration_page.dart';
+import 'package:dropdownfield/dropdownfield.dart';
 
 import 'Collaboration/Collaborator/collaborator.dart';
 
@@ -11,7 +12,6 @@ void main() async {
   await collaborationPage.constructorHelperMethod();
   Contact matthew =
       collaborationPage.getContactsFromSearch(substring: "Matthew Sheldon")[0];
-  print(collaborationPage.contactToString(contact: matthew));
   collaborationPage.addCollaborator(
       contact: matthew, useEmail: true, hasAccepted: true);
   Contact veda = collaborationPage.getContactsFromSearch(substring: "Veda")[0];
@@ -53,6 +53,9 @@ class WhiteSquare extends StatelessWidget {
   late InviteCollaborator inviteCollaborator;
   late CollaborationPage collaborationPage;
   late TextEditingController searchBarTextRetrieval = TextEditingController();
+  late List<String> contacts;
+  String selectedContact = "";
+
   WhiteSquare(
       {required this.inviteCollaborator,
       required this.collaborationPage,
@@ -60,9 +63,10 @@ class WhiteSquare extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    contacts = collaborationPage.getNamesFromSearch(substring: "");
     List<Collaborator> collaborators = collaborationPage.getCollaborators();
     collaborators.sort();
-    List<ListTile> contactsToDisplay = <ListTile>[];
+    List<ListTile> collaboratorsToDisplay = <ListTile>[];
     for (Collaborator collaborator in collaborators) {
       String contactInformation = "";
       if (collaborator.getEmail() != "null") {
@@ -81,7 +85,7 @@ class WhiteSquare extends StatelessWidget {
               ],
             );
 
-      contactsToDisplay.add(ListTile(
+      collaboratorsToDisplay.add(ListTile(
           contentPadding: EdgeInsets.symmetric(horizontal: 40.0),
           leading: CircleAvatar(
               radius: 20,
@@ -139,23 +143,46 @@ class WhiteSquare extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.fromLTRB(30.0, 10.0, 30.0, 0.0),
                 child: SizedBox(
-                  height: 40,
-                  child: TextField(
+                    height: 40,
+                    child: DropDownField(
                       controller: searchBarTextRetrieval,
-                      decoration: InputDecoration(
-                        labelText: 'Search Contacts',
-                        filled: true,
-                        fillColor: Color(0xFFECECEC),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(
-                              width: 3, color: Color(0xFFECECEC)),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      )),
-                ),
+                      hintText: "Search Contacts",
+                      enabled: true,
+                      itemsVisibleInDropdown: 5,
+                      items: contacts,
+                      onValueChanged: (value) {
+                        (() {
+                          selectedContact = value;
+                          Contact contact = collaborationPage
+                              .getContactsFromSearch(substring: value)[0];
+                          String contactInfo = "";
+                          contactInfo = (contact.emails!.isNotEmpty)
+                              ? contact.emails![0].value!
+                              : contact.phones![0].value!;
+                          Collaborator collaborator =
+                              (contact.emails!.isNotEmpty)
+                                  ? Collaborator(
+                                      name: value,
+                                      email: contactInfo,
+                                      hasAccepted: false)
+                                  : Collaborator(
+                                      name: value,
+                                      phoneNumber: contactInfo,
+                                      hasAccepted: false);
+                          collaborators.add(collaborator);
+                          (contact.emails!.isNotEmpty)
+                              ? inviteCollaborator.sendEmail(
+                                  email: contactInfo,
+                                  link: collaborationPage.getInviteLink())
+                              : inviteCollaborator.sendSMS(
+                                  phoneNumber: contactInfo,
+                                  link: collaborationPage.getInviteLink());
+                        });
+                      },
+                    )),
               ),
               SingleChildScrollView(
-                child: Column(children: contactsToDisplay),
+                child: Column(children: collaboratorsToDisplay),
               ),
               Center(
                 child: ElevatedButton(
