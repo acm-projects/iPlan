@@ -2,7 +2,7 @@ import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:matthew_backend/Collaboration/Invite_Collaborator/invite_collaborator.dart';
 import 'package:matthew_backend/Collaboration/collaboration_page.dart';
-import 'package:dropdownfield/dropdownfield.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 
 import 'Collaboration/Collaborator/collaborator.dart';
 
@@ -144,19 +144,21 @@ class WhiteSquare extends StatelessWidget {
                 padding: EdgeInsets.fromLTRB(30.0, 10.0, 30.0, 0.0),
                 child: SizedBox(
                     height: 40,
-                    child: DropDownField(
-                      controller: searchBarTextRetrieval,
-                      hintText: "Search Contacts",
-                      enabled: true,
-                      itemsVisibleInDropdown: 5,
+                    child: DropdownSearch<String>(
+                      mode: Mode.MENU,
+                      showSearchBox: true,
+                      showClearButton: true,
+                      showSelectedItems: true,
                       items: contacts,
-                      onValueChanged: (value) {
-                        (() {
+                      dropdownSearchDecoration: InputDecoration(
+                        labelText: "Search Contacts",
+                      ),
+                      onChanged: (String? value) {
+                        if (value != null) {
                           selectedContact = value;
                           Contact contact = collaborationPage
                               .getContactsFromSearch(substring: value)[0];
-                          String contactInfo = "";
-                          contactInfo = (contact.emails!.isNotEmpty)
+                          String contactInfo = (contact.emails!.isNotEmpty)
                               ? contact.emails![0].value!
                               : contact.phones![0].value!;
                           Collaborator collaborator =
@@ -177,7 +179,11 @@ class WhiteSquare extends StatelessWidget {
                               : inviteCollaborator.sendSMS(
                                   phoneNumber: contactInfo,
                                   link: collaborationPage.getInviteLink());
-                        });
+
+                          for (Collaborator temp in collaborators) {
+                            print(temp);
+                          }
+                        }
                       },
                     )),
               ),

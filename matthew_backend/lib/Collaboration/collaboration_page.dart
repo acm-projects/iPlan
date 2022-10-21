@@ -47,7 +47,12 @@ class CollaborationPage {
     _title = title;
     _date = date;
     _collaborators = <Collaborator>[];
+    _inviteLink = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
   }
+
+  // CollaborationPage.fromJson(Map<String, dynamic> json) {
+  //   List<dynamic> 
+  // }
 
   /// Used by the [CollaborationPage] constructor to mitigate the issue of
   /// asynchronous methods and constructor conflicts. Finished initializing
@@ -57,7 +62,7 @@ class CollaborationPage {
     await _contactPuller.requestContactPermissions();
     PermissionStatus permissionStatus =
         await _contactPuller.getCurrentContactPermissionStatus();
-        
+
     if (permissionStatus.isGranted) {
       _contactPermissionsEnabled = true;
       _contacts = await _contactPuller.getContactsFromOS();

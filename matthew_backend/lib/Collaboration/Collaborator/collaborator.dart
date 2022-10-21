@@ -1,4 +1,7 @@
 import 'null_parameter_exception.dart';
+// import 'dart:convert';
+// import 'package:json_serializable/json_serializable.dart';
+// import 'package:built_value/built_value.dart';
 
 /// @author [MatthewSheldon]
 /// The [Collaborator] object represents the information for an individual collaborator.
@@ -22,7 +25,8 @@ class Collaborator implements Comparable<Collaborator> {
   /// or [phoneNumber] are not passed, assume them to be ["null"]. If both
   /// [email] and [phoneNumber] are not passed, then a [NullParameterException]
   /// will be thrown and prevent the creation of the [Collaborator] object.
-  Collaborator({required String name,
+  Collaborator(
+      {required String name,
       String email = "null",
       String phoneNumber = "null",
       required bool hasAccepted}) {
@@ -34,6 +38,15 @@ class Collaborator implements Comparable<Collaborator> {
       _phoneNumber = phoneNumber;
       _hasAccepted = hasAccepted;
     }
+  }
+
+  /// Constructs a [Collaborator] object from the passed [json] file
+  /// decomposition of a [Collaborator] object.
+  Collaborator.fromJson(Map<String, dynamic> json) {
+    _name = json["name"];
+    _email = json["email"];
+    _phoneNumber = json["phoneNumber"];
+    _hasAccepted = json["hasAccepted"];
   }
 
   /// Returns the [_name] of the [Collaborator] object
@@ -56,6 +69,16 @@ class Collaborator implements Comparable<Collaborator> {
     return _hasAccepted;
   }
 
+  /// Deconstructs the current [Collaborator] object
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      "name": _name,
+      "email": _email,
+      "phoneNumber": _phoneNumber,
+      "hasAccepted": _hasAccepted
+    };
+  }
+
   /// Represents the current [Collaborator] class as the required name parameter,
   /// and the optional email and
   @override
@@ -66,7 +89,7 @@ class Collaborator implements Comparable<Collaborator> {
   }
 
   /// Sort first by whether or not the user has accepted the collaboration
-  /// invitation denoted by [_hasAccepted], and then by alphabetical order 
+  /// invitation denoted by [_hasAccepted], and then by alphabetical order
   /// denoted by [_name].
   @override
   int compareTo(Collaborator other) {
