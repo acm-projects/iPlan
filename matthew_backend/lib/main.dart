@@ -1,10 +1,10 @@
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
-import 'package:matthew_backend/Collaboration/Invite_Collaborator/invite_collaborator.dart';
-import 'package:matthew_backend/Collaboration/collaboration_page.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
 import 'Collaboration/Collaborator/collaborator.dart';
+import 'Collaboration/Invite_Collaborator/invite_collaborator.dart';
+import 'Collaboration/collaboration_page.dart';
 
 void main() async {
   CollaborationPage collaborationPage =
