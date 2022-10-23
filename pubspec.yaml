@@ -40,6 +40,8 @@ dependencies:
   google_fonts: ^3.0.1
   flutter_clean_calendar: ^1.1.0
   date_picker_timeline: ^1.2.3
+  syncfusion_flutter_charts: ^20.3.50
+  expansion_card: ^0.1.0
 
 dev_dependencies:
   flutter_test:

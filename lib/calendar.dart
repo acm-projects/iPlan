@@ -281,7 +281,7 @@ class _CalendarState extends State<Calendar> {
                           ),
                         ),
                         SizedBox(height: 10),
-                        //task name
+                        //select time
                         Container(
                           decoration: BoxDecoration(
                             color: Color.fromRGBO(254, 247, 236, 1),
