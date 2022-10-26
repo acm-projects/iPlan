@@ -1,8 +1,10 @@
+import '../../User_Creation/user.dart';
 import 'null_parameter_exception.dart';
 
 /// @author [MatthewSheldon]
-/// The [Collaborator] object represents the information for an individual collaborator.
-/// These forms of information include [_name], [_email], [_phoneNumber], [_userID], and [_hasAccepted].
+/// The [Collaborator] object represents the information for an individual 
+/// collaborator. These forms of information include [_userID], [_name], 
+/// [_email], [_phoneNumber], [_userID], and [_hasAccepted].
 class Collaborator implements Comparable<Collaborator> {
   /// The name of the collaborator
   late String _name;
@@ -37,7 +39,17 @@ class Collaborator implements Comparable<Collaborator> {
       _email = email;
       _phoneNumber = phoneNumber;
       _hasAccepted = hasAccepted;
+      // TODO: create a temporary user ID in place of what will eventually be the real one
     }
+  }
+
+  /// Constructs a [Collaborator] object from the passed [User] object
+  Collaborator.fromUser({required User user}) {
+    _userID = user.getUserID();
+    _name = user.getUserName();
+    _email = user.getEmail();
+    _phoneNumber = "null";
+    _hasAccepted = true;
   }
 
   /// Constructs a [Collaborator] object from the passed [json] file
@@ -69,9 +81,33 @@ class Collaborator implements Comparable<Collaborator> {
     return _phoneNumber;
   }
 
+  String getUserID() {
+    return _userID;
+  }
+
   /// Returns whether or not the [Collaborator] has accepte the invitation
   bool hasAccepted() {
     return _hasAccepted;
+  }
+
+  /// Updates the user ID of the [Collaborator] object to be [userID]
+  void updateUserID({required String userID}) {
+    _userID = userID;
+  }
+
+  /// Updates the name of the [Collaborator] object to be [name]
+  void updateName({required String name}) {
+    _name = name;
+  }
+
+  /// Updates the email of the [Collaborator] object to be [email]
+  void updateEmail({required String email}) {
+    _email = email;
+  }
+
+  /// Updates the acceptance status of the [Collaborator] object to be [hasAccepted]
+  void updateHasAccepted({required bool hasAccepted}) {
+    _hasAccepted = hasAccepted;
   }
 
   /// Deconstructs the current [Collaborator] object in a JSON format
@@ -90,7 +126,7 @@ class Collaborator implements Comparable<Collaborator> {
   @override
   String toString() {
     return "Name: $_name\n"
-        "${_email == null ? "" : "Email: $_email"}\n"
+        "${_email == "null" ? "" : "Email: $_email"}\n"
         "${_phoneNumber == "null" ? "" : "Phone Number: $_phoneNumber"}\n";
   }
 
@@ -101,9 +137,7 @@ class Collaborator implements Comparable<Collaborator> {
   int compareTo(Collaborator other) {
     if (_hasAccepted == other._hasAccepted) {
       return _name.compareTo(other._name);
-    } else if (_hasAccepted) {
-      return -1;
     }
-    return 1;
+    return _hasAccepted ? -1 : 1;
   }
 }

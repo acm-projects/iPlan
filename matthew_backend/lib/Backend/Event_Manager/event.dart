@@ -1,4 +1,5 @@
 import '../Collaboration/collaboration_page.dart';
+import '../User_Creation/user.dart';
 
 /// @author [MatthewSheldon]
 /// Class used for housing all of the different pages, as well as constructing
@@ -54,13 +55,28 @@ class Event {
     return _collaborationPage;
   }
 
-  /// Convers the current [Event] object into a json file formatted map
+  /// Converts the current [Event] object into a json file formatted map
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
+      //"financePage": _financePage.toJson();
       "financePage": "{}",
+      //"calendarPage": _calendarPage.toJson();
       "calendarPage": "{}",
+      //"itineraryPage": _itineraryPage.toJson();
       "itineraryPage": "{}",
       "collaborationPage": _collaborationPage.toJson()
     };
+  }
+
+  /// Updates the list of collaborators by replacing the place holder [Collaborator]
+  /// object described by [oldUserID] with the actual [User] object described by [user]
+  void updateCollaborator({required String oldUserID, required User user}) {
+    _collaborationPage.updateCollaborator(oldUserID: oldUserID, user: user);
+  }
+
+  /// Adds the [User] object described by [user] as a [Collaborator] object
+  /// in the event's list of collaborators 
+  void addCollaboratorFromUser({required User user}) {
+    _collaborationPage.addCollaboratorFromUser(user: user);
   }
 }

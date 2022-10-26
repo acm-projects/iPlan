@@ -1,6 +1,7 @@
 import 'package:contacts_service/contacts_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../User_Creation/user.dart';
 import '../Navigation_Bar/page_type.dart';
 import 'Contact_Search/contact_mapper.dart';
 import 'Contact_Search/contact_puller.dart';
@@ -13,8 +14,6 @@ import 'Collaborator/null_parameter_exception.dart';
 /// user's native OS contacts app, store and mannage current [Collaborator]
 /// objects, and search the user's contacts for people who's display names match
 /// or contain a certain substring.
-/// TODO: implement the link creation, compression, and expansion once other
-/// classes have been created.
 class CollaborationPage {
   /// The list of [Collaborator] objects for the current event
   late List<Collaborator> _collaborators;
@@ -23,7 +22,8 @@ class CollaborationPage {
   late List<Contact> _contacts;
 
   /// The mapping between names of contacts and [Contact] objects
-  late ContactMap _contactMap;
+  late ContactMap
+      _contactMap; // TODO: remove [ContactMap] if it is no longer a needed class
 
   /// The tool used to request contact permissions and scrape the user's contacts
   late ContactPuller _contactPuller;
@@ -51,6 +51,7 @@ class CollaborationPage {
     _inviteLink = link;
   }
 
+  /// Constructs a [CollaborationPage] object from the passed [json] and [link] parameters
   CollaborationPage.fromJson(
       {required Map<String, dynamic> json, required String link}) {
     _title = json["title"];
@@ -114,21 +115,6 @@ class CollaborationPage {
     return _contactPermissionsEnabled ? _collaborators : <Collaborator>[];
   }
 
-  /// Returns a list of names that match the [substring] parameter.
-  List<String> getNamesFromSearch({required String substring}) {
-    return _contactPermissionsEnabled
-        ? _contactMap.getNamesThatContain(substring: substring)
-        : <String>[];
-  }
-
-  /// Returns a list of Contacts that match the [substring] parameter.
-  List<Contact> getContactsFromSearch({required String substring}) {
-    return _contactPermissionsEnabled
-        ? _contactMap.getContactsFromNames(
-            names: getNamesFromSearch(substring: substring))
-        : <Contact>[];
-  }
-
   /// Returns a [String] representation of the passed [contact] parameter
   String contactToString({required Contact contact}) {
     String output =
@@ -182,6 +168,26 @@ class CollaborationPage {
         print("Collaborator was attempted to be made with phone number, "
             "but no phone number exists for ${contact.displayName}'s contact.");
         print(e);
+      }
+    }
+  }
+
+  /// Adds the passed [User] object as a [Collaborator] object to the [_collaborators] list
+  void addCollaboratorFromUser({required User user}) {
+    _collaborators.add(Collaborator.fromUser(user: user));
+  }
+
+  /// Updates the [Collaborator] object described by the passed [oldUserID]
+  /// parameter with the information contained in the passed [User] object
+  void updateCollaborator({required String oldUserID, required User user}) {
+    for (int i = 0; i < _collaborators.length; i++) {
+      Collaborator collaborator = _collaborators[i];
+      if (collaborator.getUserID() == oldUserID) {
+        collaborator.updateUserID(userID: user.getUserID());
+        collaborator.updateEmail(email: user.getEmail());
+        collaborator.updateName(name: user.getUserName());
+        collaborator.updateHasAccepted(hasAccepted: true);
+        break;
       }
     }
   }
