@@ -48,7 +48,7 @@ class ContactMap {
     return _nameToContact[name]!;
   }
 
-  /// Returns a list of [Contact] objects which map to the passed list of [String] [names]
+  /// Returns a list of [Contact] objects which map to the passed list of [names]
   List<Contact> getContactsFromNames({required List<String> names}) {
     List<Contact> contacts = <Contact>[];
     for (String name in names) {

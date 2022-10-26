@@ -1,7 +1,7 @@
 import 'package:contacts_service/contacts_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../page_type.dart';
+import '../Navigation_Bar/page_type.dart';
 import 'Contact_Search/contact_mapper.dart';
 import 'Contact_Search/contact_puller.dart';
 import 'Collaborator/collaborator.dart';
@@ -43,16 +43,24 @@ class CollaborationPage {
 
   /// Creates a [CollaborationPage] object with the passed [title] and [date]
   /// parameters. The invite link will be created as time goes on.
-  CollaborationPage({required String title, required String date}) {
+  CollaborationPage(
+      {required String title, required String date, required String link}) {
     _title = title;
     _date = date;
     _collaborators = <Collaborator>[];
-    _inviteLink = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+    _inviteLink = link;
   }
 
-  // CollaborationPage.fromJson(Map<String, dynamic> json) {
-  //   List<dynamic> 
-  // }
+  CollaborationPage.fromJson(
+      {required Map<String, dynamic> json, required String link}) {
+    _title = json["title"];
+    _date = json["date"];
+    List<dynamic> collaboratorsData = json["collaborators"] as List<dynamic>;
+    _collaborators = collaboratorsData
+        .map((collaborator) => Collaborator.fromJson(collaborator))
+        .toList();
+    _inviteLink = link;
+  }
 
   /// Used by the [CollaborationPage] constructor to mitigate the issue of
   /// asynchronous methods and constructor conflicts. Finished initializing
@@ -176,5 +184,15 @@ class CollaborationPage {
         print(e);
       }
     }
+  }
+
+  /// Deconstructs the current [CollaborationPage] object in a JSON format
+  Map<String, dynamic> toJson() {
+    return {
+      "date": _date,
+      "collaborators":
+          _collaborators.map((collaborator) => collaborator.toJson()).toList(),
+      "title": _title
+    };
   }
 }

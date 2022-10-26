@@ -4,6 +4,7 @@
 class Expense {
   /// The name of the expense item
   late String _expenseName;
+  
   /// The amount of money allocated for the expense item
   late double _budgetForExpense;
 

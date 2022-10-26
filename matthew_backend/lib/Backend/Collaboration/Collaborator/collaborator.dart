@@ -1,14 +1,14 @@
 import 'null_parameter_exception.dart';
-// import 'dart:convert';
-// import 'package:json_serializable/json_serializable.dart';
-// import 'package:built_value/built_value.dart';
 
 /// @author [MatthewSheldon]
 /// The [Collaborator] object represents the information for an individual collaborator.
-/// These forms of information include [_name], [_email], and [_phoneNumber].
+/// These forms of information include [_name], [_email], [_phoneNumber], [_userID], and [_hasAccepted].
 class Collaborator implements Comparable<Collaborator> {
   /// The name of the collaborator
   late String _name;
+
+  /// The userID of the collaborator
+  late String _userID;
 
   /// The email of the collaborator
   late String _email;
@@ -43,10 +43,15 @@ class Collaborator implements Comparable<Collaborator> {
   /// Constructs a [Collaborator] object from the passed [json] file
   /// decomposition of a [Collaborator] object.
   Collaborator.fromJson(Map<String, dynamic> json) {
-    _name = json["name"];
-    _email = json["email"];
-    _phoneNumber = json["phoneNumber"];
-    _hasAccepted = json["hasAccepted"];
+    if (json["email"] == "null" && json["phoneNumber"] == "null") {
+      throw NullParameterException();
+    } else {
+      _name = json["name"];
+      _email = json["email"];
+      _phoneNumber = json["phoneNumber"];
+      _hasAccepted = json["hasAccepted"];
+      _userID = json["userID"];
+    }
   }
 
   /// Returns the [_name] of the [Collaborator] object
@@ -69,13 +74,14 @@ class Collaborator implements Comparable<Collaborator> {
     return _hasAccepted;
   }
 
-  /// Deconstructs the current [Collaborator] object
+  /// Deconstructs the current [Collaborator] object in a JSON format
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
+      "hasAccepted": _hasAccepted,
+      "phoneNumber": _phoneNumber,
       "name": _name,
       "email": _email,
-      "phoneNumber": _phoneNumber,
-      "hasAccepted": _hasAccepted
+      "userID": _userID
     };
   }
 
@@ -93,9 +99,9 @@ class Collaborator implements Comparable<Collaborator> {
   /// denoted by [_name].
   @override
   int compareTo(Collaborator other) {
-    if (this._hasAccepted == other._hasAccepted) {
-      return this._name.compareTo(other._name);
-    } else if (this._hasAccepted) {
+    if (_hasAccepted == other._hasAccepted) {
+      return _name.compareTo(other._name);
+    } else if (_hasAccepted) {
       return -1;
     }
     return 1;

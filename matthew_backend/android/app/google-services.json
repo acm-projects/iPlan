@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "219119728910",
+    "project_id": "matthew-backend",
+    "storage_bucket": "matthew-backend.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:219119728910:android:e63ed30a1bd330ddd5ff5f",
+        "android_client_info": {
+          "package_name": "com.punchwood2003.matthew_backend"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "219119728910-fcngcv92qklq6tbiaomj587v0vq1ved6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.punchwood2003.matthew_backend",
+            "certificate_hash": "71f61bde9433c2892b5a16e9941962cf7cd02e08"
+          }
+        },
+        {
+          "client_id": "219119728910-8bbmsti0q9jdbaijgh6f6om37lv7ist8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBv0yAQFTKUBMVn7l9--gPfNTQi-Z7XyQg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "219119728910-8bbmsti0q9jdbaijgh6f6om37lv7ist8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
