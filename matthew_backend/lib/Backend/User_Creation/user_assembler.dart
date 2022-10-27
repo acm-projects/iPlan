@@ -54,7 +54,8 @@ class UserAssembler {
           .then((document) => document.data());
       user = User.fromJson(userID: _userID, json: json1);
     } catch (e) {
-      ans[0] = failedUserIDToUser;
+      print(e);
+      ans.add(failedUserIDToUser);
       return ans;
     }
 
@@ -69,28 +70,16 @@ class UserAssembler {
             .then((document) => document.data());
         user.addEvent(event: Event.fromJson(json: json2, link: eventID));
       } catch (e) {
+        print(e);
         failed = true;
       }
     }
 
     // Return the proper code and User object
-    ans[0] = failed ? failedEvents : success;
-    ans[1] = _user;
+    _user = user;
+    ans.add(failed ? failedEvents : success);
+    ans.add(user);
     return ans;
-  }
-
-  /// TODO: testing method; fix in the future
-  Future<bool> updateUserToCloud(
-      {required String eventID,
-      required String key,
-      required Map<String, dynamic> value}) async {
-    WidgetsFlutterBinding.ensureInitialized();
-    await Firebase.initializeApp();
-    await FirebaseFirestore.instance
-        .collection("events")
-        .doc(eventID)
-        .update({key: value});
-    return true;
   }
 
   /// Returns the user's ID

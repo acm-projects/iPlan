@@ -45,16 +45,16 @@ class UserCreator {
             .set(user.toJson());
       } catch (e) {
         print(e);
-        ans[0] = userIDToUserFailed;
+        ans.add(userIDToUserFailed);
         return ans;
       }
     } else {
-      ans[0] = userFailed;
+      ans.add(userFailed);
       return ans;
     }
 
-    ans[0] = success;
-    ans[1] = userID;
+    ans.add(success);
+    ans.add(userID);
     return ans;
   }
 }

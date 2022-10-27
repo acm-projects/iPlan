@@ -35,6 +35,7 @@ class EventCreator {
   /// than the 20 characters associated with an event ID, then additionally
   /// update the Event's list of collaborators with the new [User] object.
   /// Returns the code and the updated [User] object if nothing critical failed.
+  /// TODO: check to make sure that the user has not already been added
   static Future<List<dynamic>> joinEventFromLink(
       {required User user, required String link}) async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -53,11 +54,13 @@ class EventCreator {
     // Attempt to retrieve the json file for the event
     var json;
     try {
-      json =
-          await FirebaseFirestore.instance.collection("events").doc(link).get();
-      user.addEventID(eventID: link);
+      await FirebaseFirestore.instance
+          .collection("events")
+          .doc(link)
+          .get()
+          .then((doc) => json = doc.data() as Map<String, dynamic>);
     } catch (e) {
-      ans[0] = eventFileFetchFailed;
+      ans.add(eventFileFetchFailed);
       return ans;
     }
 
@@ -76,7 +79,7 @@ class EventCreator {
 
     // If _updateEventDocumentInCloud failed, the return the proper error code
     if (failed) {
-      ans[0] = eventUpdateFailed;
+      ans.add(eventUpdateFailed);
       return ans;
     }
 
@@ -87,10 +90,10 @@ class EventCreator {
     // Attempt to update the user document to reflect the updated user
     failed = await _updateUserDocumentInCloud(user: user);
 
-    // If _updateUserDocumentInCloud failed, return the proper error code; 
+    // If _updateUserDocumentInCloud failed, return the proper error code;
     // otherwise, return the success code and updated user object
-    ans[0] = failed ? userUpdateFailed : success;
-    ans[1] = user;
+    ans.add(failed ? userUpdateFailed : success);
+    ans.add(user);
     return ans;
   }
 
@@ -115,7 +118,7 @@ class EventCreator {
   static Future<bool> _updateUserDocumentInCloud({required User user}) async {
     try {
       await FirebaseFirestore.instance
-          .collection("user id to events")
+          .collection("user id to user")
           .doc(user.getUserID())
           .update(user.toJson());
     } catch (e) {

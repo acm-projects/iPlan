@@ -33,6 +33,7 @@ class User {
     _userName = name;
     _email = email;
     _eventIDs = eventIDs;
+    _events = <Event>[];
   }
 
   /// Constructs a [User] object from the passed [userID] and [json] file
@@ -40,7 +41,11 @@ class User {
     _userID = userID;
     _userName = json["name"];
     _email = json["email"];
-    _eventIDs = json["events"] as List<String>;
+    _eventIDs = <String>[];
+    for (dynamic eventID in json["eventIDs"]) {
+      _eventIDs.add(eventID.toString());
+    }
+    _events = <Event>[];
   }
 
   /// Adds the passed [eventID] to the user's [_eventIDs] list
