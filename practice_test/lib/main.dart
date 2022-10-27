@@ -11,13 +11,13 @@ void main() async {
       CollaborationPage(title: "Event Name", date: "April 25, 2022");
   await collaborationPage.constructorHelperMethod();
   Contact matthew =
-      collaborationPage.getContactsFromSearch(substring: "Matthew Sheldon")[0];
+      collaborationPage.getContactsFromSearch(substring: "Jenny Ong")[0];
   collaborationPage.addCollaborator(
       contact: matthew, useEmail: true, hasAccepted: true);
-  Contact veda = collaborationPage.getContactsFromSearch(substring: "Veda")[0];
+  Contact veda = collaborationPage.getContactsFromSearch(substring: "Robin Chan")[0];
   collaborationPage.addCollaborator(
       contact: veda, useEmail: false, hasAccepted: true);
-  Contact casi = collaborationPage.getContactsFromSearch(substring: "Casi")[0];
+  Contact casi = collaborationPage.getContactsFromSearch(substring: "Josh Widley")[0];
   collaborationPage.addCollaborator(
       contact: casi, useEmail: false, hasAccepted: false);
   InviteCollaborator inviteCollaborator = InviteCollaborator();
