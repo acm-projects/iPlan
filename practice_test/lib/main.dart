@@ -2,13 +2,13 @@ import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
-import 'Collaboration/Invite_Collaborator/invite_collaborator.dart';
-import 'Collaboration/collaboration_page.dart';
-import 'Collaboration/Collaborator/collaborator.dart';
+import 'Backend/Collaboration/Invite_Collaborator/invite_collaborator.dart';
+import 'Backend/Collaboration/collaboration_page.dart';
+import 'Backend/Collaboration/Collaborator/collaborator.dart';
 
 void main() async {
   CollaborationPage collaborationPage =
-      CollaborationPage(title: "Event Name", date: "April 25, 2022");
+      CollaborationPage(title: "Event Name", date: "April 25, 2022", link: "ggaVFh6jrUqhVLlDl38w");
   await collaborationPage.constructorHelperMethod();
   Contact matthew =
       collaborationPage.getContactsFromSearch(substring: "Matthew Sheldon")[0];
@@ -150,7 +150,7 @@ class WhiteSquare extends StatelessWidget {
                       showClearButton: true,
                       showSelectedItems: true,
                       items: contacts,
-                      dropdownSearchDecoration: InputDecoration(
+                      dropdownSearchDecoration: InputDecoration(  
                         labelText: "Search Contacts",
                       ),
                       onChanged: (String? value) {

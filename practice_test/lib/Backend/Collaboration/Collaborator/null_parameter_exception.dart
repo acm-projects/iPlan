@@ -4,13 +4,13 @@
 class NullParameterException implements Exception {
   /// The error message to be printed when a [NullParameterException] object is thrown
   final String _errorMessage = "Both 'email' and 'phoneNumber' parameters cannot be null.\n"
-      "Please pass a non-null value for either 'email' or 'phoneNumber";
+      "Please pass a non-null value for either 'email' and/or 'phoneNumber";
 
   /// Constructs a default [NullparameterException] object
   NullParameterException();
 
-  @override
   /// Returns the error message for a [NullParameterException] object
+  @override
   String toString() {
     return _errorMessage;
   }

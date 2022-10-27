@@ -1,7 +1,8 @@
 import 'package:contacts_service/contacts_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../page_type.dart';
+import '../User_Creation/user.dart';
+import '../Navigation_Bar/page_type.dart';
 import 'Contact_Search/contact_mapper.dart';
 import 'Contact_Search/contact_puller.dart';
 import 'Collaborator/collaborator.dart';
@@ -13,8 +14,6 @@ import 'Collaborator/null_parameter_exception.dart';
 /// user's native OS contacts app, store and mannage current [Collaborator]
 /// objects, and search the user's contacts for people who's display names match
 /// or contain a certain substring.
-/// TODO: implement the link creation, compression, and expansion once other
-/// classes have been created.
 class CollaborationPage {
   /// The list of [Collaborator] objects for the current event
   late List<Collaborator> _collaborators;
@@ -23,7 +22,8 @@ class CollaborationPage {
   late List<Contact> _contacts;
 
   /// The mapping between names of contacts and [Contact] objects
-  late ContactMap _contactMap;
+  late ContactMap
+      _contactMap; // TODO: remove [ContactMap] if it is no longer a needed class
 
   /// The tool used to request contact permissions and scrape the user's contacts
   late ContactPuller _contactPuller;
@@ -43,11 +43,24 @@ class CollaborationPage {
 
   /// Creates a [CollaborationPage] object with the passed [title] and [date]
   /// parameters. The invite link will be created as time goes on.
-  CollaborationPage({required String title, required String date}) {
+  CollaborationPage(
+      {required String title, required String date, required String link}) {
     _title = title;
     _date = date;
     _collaborators = <Collaborator>[];
-    _inviteLink = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+    _inviteLink = link;
+  }
+
+  /// Constructs a [CollaborationPage] object from the passed [json] and [link] parameters
+  CollaborationPage.fromJson(
+      {required Map<String, dynamic> json, required String link}) {
+    _title = json["title"];
+    _date = json["date"];
+    List<dynamic> collaboratorsData = json["collaborators"] as List<dynamic>;
+    _collaborators = collaboratorsData
+        .map((collaborator) => Collaborator.fromJson(collaborator))
+        .toList();
+    _inviteLink = link;
   }
 
   /// Used by the [CollaborationPage] constructor to mitigate the issue of
@@ -172,5 +185,35 @@ class CollaborationPage {
         print(e);
       }
     }
+  }
+
+  /// Adds the passed [User] object as a [Collaborator] object to the [_collaborators] list
+  void addCollaboratorFromUser({required User user}) {
+    _collaborators.add(Collaborator.fromUser(user: user));
+  }
+
+  /// Updates the [Collaborator] object described by the passed [oldUserID]
+  /// parameter with the information contained in the passed [User] object
+  void updateCollaborator({required String oldUserID, required User user}) {
+    for (int i = 0; i < _collaborators.length; i++) {
+      Collaborator collaborator = _collaborators[i];
+      if (collaborator.getUserID() == oldUserID) {
+        collaborator.updateUserID(userID: user.getUserID());
+        collaborator.updateEmail(email: user.getEmail());
+        collaborator.updateName(name: user.getUserName());
+        collaborator.updateHasAccepted(hasAccepted: true);
+        break;
+      }
+    }
+  }
+
+  /// Deconstructs the current [CollaborationPage] object in a JSON format
+  Map<String, dynamic> toJson() {
+    return {
+      "date": _date,
+      "collaborators":
+          _collaborators.map((collaborator) => collaborator.toJson()).toList(),
+      "title": _title
+    };
   }
 }
