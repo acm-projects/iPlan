@@ -6,12 +6,16 @@ import 'expense.dart';
 class FinanceCategory {
   /// The name of the finance category
   late String _categoryName;
+
   /// The amount of unspent budget for the category
   late double _budgetRemaining;
+
   /// The amount of spent budget for the category
   late double _budgetUsed;
+
   /// The total allocated budget for the category
   late double _totalBudget;
+  
   /// The list of the individual expenses for the category
   late List<Expense> _listOfExpenses;
 
