@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'authPage/login.dart';
-import 'authPage/register.dart';
-import 'authPage/forgotPass.dart';
+import 'Authentication/login.dart';
+import 'Authentication/register.dart';
+import 'Authentication/forgotPass.dart';
 
-import 'budget.dart';
-import 'calendar.dart';
-import 'eventHome.dart';
-import 'settings.dart';
+import 'Finance/budget.dart';
+import 'Calendar/calendar.dart';
+import 'Home_Page/eventHome.dart';
+import 'Settings/settings.dart';
 
 void main() {
   runApp(MyApp());

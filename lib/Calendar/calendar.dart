@@ -10,7 +10,9 @@ order tasks from earliest time to latest time in selectedTasks
  */
 
 //can be replaced with backend task class, requires title, day, time, isComplete
-import 'helpers/task.dart';
+import 'package:flutter/services.dart';
+
+import '../Helpers/task.dart';
 
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -264,6 +266,9 @@ class _CalendarState extends State<Calendar> {
                           child: Padding(
                             padding: const EdgeInsets.only(left: 10.0),
                             child: TextField(
+                              inputFormatters: [
+                                LengthLimitingTextInputFormatter(20),
+                              ],
                               controller: _taskController,
                               style: GoogleFonts.lato(
                                 color: Colors.black,

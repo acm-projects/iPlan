@@ -22,6 +22,9 @@ Widget email(TextEditingController _emailController){
       child: Padding(
         padding: const EdgeInsets.only(left: 10.0),
         child: TextField(
+          inputFormatters: [
+            LengthLimitingTextInputFormatter(30),
+          ],
           controller: _emailController,
           keyboardType: TextInputType.emailAddress,
           style: GoogleFonts.lato(

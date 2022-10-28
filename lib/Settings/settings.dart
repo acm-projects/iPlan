@@ -11,7 +11,9 @@ store and retrieve user info
  */
 
 //can be replaced with backend user class, requires name/email/password
-import 'helpers/user.dart';
+import 'package:flutter/services.dart';
+
+import '../Helpers/user.dart';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -286,6 +288,9 @@ class _SettingsState extends State<Settings> {
         child: Padding(
           padding: const EdgeInsets.only(left: 10.0),
           child: TextField(
+            inputFormatters: [
+              LengthLimitingTextInputFormatter(20),
+            ],
             controller: _nameController,
             keyboardType: TextInputType.name,
             style: GoogleFonts.lato(
@@ -317,6 +322,9 @@ class _SettingsState extends State<Settings> {
         child: Padding(
           padding: const EdgeInsets.only(left: 10.0),
           child: TextField(
+            inputFormatters: [
+              LengthLimitingTextInputFormatter(20),
+            ],
             controller: _passwordController,
             obscureText: true,
             style: GoogleFonts.lato(
@@ -348,6 +356,9 @@ class _SettingsState extends State<Settings> {
         child: Padding(
           padding: const EdgeInsets.only(left: 10.0),
           child: TextField(
+            inputFormatters: [
+              LengthLimitingTextInputFormatter(20),
+            ],
             controller: _confPasswordController,
             obscureText: true,
             style: GoogleFonts.lato(
