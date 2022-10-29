@@ -5,6 +5,7 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'Backend/Collaboration/Invite_Collaborator/invite_collaborator.dart';
 import 'Backend/Collaboration/collaboration_page.dart';
 import 'Backend/Collaboration/Collaborator/collaborator.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
   CollaborationPage collaborationPage =
@@ -28,33 +29,21 @@ void main() async {
       searchBarTextRetrieval: searchBarTextRetrieval));
 }
 
+//CASI - Changed to GoogleFont style
 class CollaborateTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text.rich(
-        TextSpan(
-          text: '',
-          children: [
-            TextSpan(
-                text: 'Collaborate',
-                style: TextStyle(
-                    fontSize: 50.0,
-                    color: Color(0xFFFEF7EC),
-                    fontWeight: FontWeight.bold)),
-          ],
-        ),
-      ),
+    return Center(
+      child: Text('Collaborate', style: GoogleFonts.lato(fontSize: 50.0, color: Color(0xFFFEF7EC), fontWeight: FontWeight.bold))
     );
   }
 }
 
-class WhiteSquare extends StatelessWidget {
+//CASI - Changed to StatefulWidget
+class WhiteSquare extends StatefulWidget {
   late InviteCollaborator inviteCollaborator;
   late CollaborationPage collaborationPage;
   late TextEditingController searchBarTextRetrieval = TextEditingController();
-  late List<String> contacts;
-  String selectedContact = "";
 
   WhiteSquare(
       {required this.inviteCollaborator,
@@ -62,9 +51,18 @@ class WhiteSquare extends StatelessWidget {
       required this.searchBarTextRetrieval});
 
   @override
+  State<WhiteSquare> createState() => _WhiteSquareState();
+}
+
+class _WhiteSquareState extends State<WhiteSquare> {
+  late List<String> contacts;
+
+  String selectedContact = "";
+
+  @override
   Widget build(BuildContext context) {
-    contacts = collaborationPage.getNamesFromSearch(substring: "");
-    List<Collaborator> collaborators = collaborationPage.getCollaborators();
+    contacts = widget.collaborationPage.getNamesFromSearch(substring: "");
+    List<Collaborator> collaborators = widget.collaborationPage.getCollaborators();
     collaborators.sort();
     List<ListTile> collaboratorsToDisplay = <ListTile>[];
     for (Collaborator collaborator in collaborators) {
@@ -76,28 +74,30 @@ class WhiteSquare extends StatelessWidget {
       }
 
       Widget trailing = collaborator.hasAccepted()
-          ? Text("Collaborator")
+          ? Text("Collaborator", style: GoogleFonts.lato())
           : Wrap(
               spacing: 2,
-              children: const <Widget>[
-                Icon(Icons.check, color: Colors.black, size: 17),
-                Text("Invited"),
+              children: <Widget>[
+                const Icon(Icons.check, color: Colors.black, size: 17),
+                Text("Invited", style: GoogleFonts.lato()),
               ],
             );
 
       collaboratorsToDisplay.add(ListTile(
           contentPadding: EdgeInsets.symmetric(horizontal: 40.0),
-          leading: CircleAvatar(
+          leading: const CircleAvatar(
               radius: 20,
-              backgroundColor: Colors.grey,
+              backgroundColor: Color(0xFFA3B0EB),
               child: Icon(Icons.person, color: Color(0xFFFEF7EC))),
-          title: Text("${collaborator.getName()}"),
-          subtitle: Text("$contactInformation"),
+          title: Text("${collaborator.getName()}", style: GoogleFonts.lato()),
+          subtitle: Text("$contactInformation", style: GoogleFonts.lato()),
           trailing: trailing));
+          setState(() {});
+
     }
 
     return Container(
-        height: 600.0,
+        height: 683.4,
         color: Colors.transparent,
         child: Container(
             decoration: const BoxDecoration(
@@ -112,33 +112,21 @@ class WhiteSquare extends StatelessWidget {
                 child: Container(
                     padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                      border: Border.all(width: 5, color: Color(0xFF657BE3)),
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      border: Border.all(width: 4, color: Color(0xFF657BE3)),
                     ),
                     child: Column(
                       children: [
-                        Text("${collaborationPage.getTitle()}",
-                            style: TextStyle(
+                        Text("${widget.collaborationPage.getTitle()}",
+                            style: GoogleFonts.lato(
                                 fontSize: 20, fontWeight: FontWeight.bold)),
-                        Text("${collaborationPage.getDate()}")
+                        Text("${widget.collaborationPage.getDate()}", style: GoogleFonts.lato())
                       ],
                     )),
               ),
               Padding(
                 padding: EdgeInsets.fromLTRB(30.0, 0.0, 30.0, 0.0),
-                child: const Text.rich(
-                  TextSpan(
-                    text: '',
-                    children: [
-                      TextSpan(
-                          text: 'Share Invitation',
-                          style: TextStyle(
-                              fontSize: 18.0,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w400)),
-                    ],
-                  ),
-                ),
+                child: Text('Share Invitation', style: GoogleFonts.lato(fontSize: 18.0, color: Colors.black, fontWeight: FontWeight.w400)),
               ),
               Padding(
                 padding: EdgeInsets.fromLTRB(30.0, 10.0, 30.0, 0.0),
@@ -150,13 +138,23 @@ class WhiteSquare extends StatelessWidget {
                       showClearButton: true,
                       showSelectedItems: true,
                       items: contacts,
-                      dropdownSearchDecoration: InputDecoration(  
+                      dropdownSearchDecoration: InputDecoration(
                         labelText: "Search Contacts",
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color(0xFF657BE3),
+                            width: 1
+                          ),
+                          borderRadius: BorderRadius.circular(15)
+                        ),
+                      ),
+                      searchFieldProps: TextFieldProps(
+                        cursorColor: Color(0xFF657BE3),
                       ),
                       onChanged: (String? value) {
                         if (value != null) {
                           selectedContact = value;
-                          Contact contact = collaborationPage
+                          Contact contact = widget.collaborationPage
                               .getContactsFromSearch(substring: value)[0];
                           String contactInfo = (contact.emails!.isNotEmpty)
                               ? contact.emails![0].value!
@@ -172,13 +170,14 @@ class WhiteSquare extends StatelessWidget {
                                       phoneNumber: contactInfo,
                                       hasAccepted: false);
                           collaborators.add(collaborator);
+                          setState(() {}); //CAsi - Set State
                           (contact.emails!.isNotEmpty)
-                              ? inviteCollaborator.sendEmail(
+                              ? widget.inviteCollaborator.sendEmail(
                                   email: contactInfo,
-                                  link: collaborationPage.getInviteLink())
-                              : inviteCollaborator.sendSMS(
+                                  link: widget.collaborationPage.getInviteLink())
+                              : widget.inviteCollaborator.sendSMS(
                                   phoneNumber: contactInfo,
-                                  link: collaborationPage.getInviteLink());
+                                  link: widget.collaborationPage.getInviteLink());
 
                           for (Collaborator temp in collaborators) {
                             print(temp);
@@ -187,15 +186,24 @@ class WhiteSquare extends StatelessWidget {
                       },
                     )),
               ),
-              SingleChildScrollView(
-                child: Column(children: collaboratorsToDisplay),
+              Container(
+                height: 400,
+                child: Expanded(
+                    child: ListView.builder(
+                        itemCount: collaboratorsToDisplay.length,
+                        itemBuilder: (context, index){
+                        return collaboratorsToDisplay[index];
+                      }
+                  ),
+                ),
               ),
+              
               Center(
                 child: ElevatedButton(
                     child: Row(children: [
                       Icon(Icons.link, size: 25, color: Colors.black),
-                      Text("     Copy Link",
-                          style: TextStyle(
+                      Text("         Copy Link",
+                          style: GoogleFonts.lato(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
                               color: Colors.black))
@@ -212,7 +220,8 @@ class WhiteSquare extends StatelessWidget {
   }
 }
 
-class MyApp extends StatelessWidget {
+//CASI - Turned Stateful
+class MyApp extends StatefulWidget {
   final InviteCollaborator? inviteCollaborator;
   final CollaborationPage? collaborationPage;
   final TextEditingController? searchBarTextRetrieval;
@@ -223,59 +232,57 @@ class MyApp extends StatelessWidget {
       required this.searchBarTextRetrieval});
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
         title: 'iPlan',
         home: Scaffold(
           backgroundColor: Color(0xFF657BE3),
-          body: Center(
-            child: SingleChildScrollView(
-              child: Column(
-                children: <Widget>[
-                  Padding(
-                      padding: EdgeInsets.fromLTRB(0.0, 50.0, 0.0, 5.0),
-                      //widget that has title of page
-                      child: CollaborateTitle()),
-                  Padding(
-                      padding: EdgeInsets.fromLTRB(0.0, 9.0, 0.0, 0.0),
-                      //container widget that includes all other widgets
-                      child: WhiteSquare(
-                        inviteCollaborator: this.inviteCollaborator!,
-                        collaborationPage: this.collaborationPage!,
-                        searchBarTextRetrieval: this.searchBarTextRetrieval!,
-                      )),
-                ],
-              ),
+          body: SingleChildScrollView(
+            child: Center(
+                child: Column(
+                  children: <Widget>[
+                    Padding(
+                        padding: EdgeInsets.fromLTRB(0.0, 50.0, 0.0, 5.0),
+                        child: CollaborateTitle(),
+                    ),
+                    Padding(
+                        padding: EdgeInsets.fromLTRB(0.0, 9.0, 0.0, 0.0),
+                        //container widget that includes all other widgets
+                        child: WhiteSquare(
+                          inviteCollaborator: this.widget.inviteCollaborator!,
+                          collaborationPage: this.widget.collaborationPage!,
+                          searchBarTextRetrieval: this.widget.searchBarTextRetrieval!,
+                        )),
+                  ],
+                ),
+              
             ),
           ),
 
-          //Navigation Bar with Icons
+          //Casi - Changed Nav bar
           bottomNavigationBar: BottomNavigationBar(
-              showSelectedLabels: false,
-              showUnselectedLabels: false,
-              items: const <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.house, color: Colors.black, size: 30),
-                    label: 'home',
-                    backgroundColor: Color(0xFFA3B0EB)),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.person, color: Colors.black, size: 30),
-                    label: 'collaborate',
-                    backgroundColor: Color(0xFFA3B0EB)),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.list, color: Colors.black, size: 30),
-                    label: 'itinerary',
-                    backgroundColor: Color(0xFFA3B0EB)),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.calendar_month,
-                        color: Colors.black, size: 30),
-                    label: 'calendar',
-                    backgroundColor: Color(0xFFA3B0EB)),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.settings, color: Colors.black, size: 30),
-                    label: 'settings',
-                    backgroundColor: Color(0xFFA3B0EB))
-              ]),
-        ));
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Color(0xFFA3B0EB),
+            selectedItemColor: Color.fromRGBO(254, 247, 236, 1),
+            unselectedItemColor: Colors.black,
+            showSelectedLabels: true,
+            showUnselectedLabels: false,
+            landscapeLayout: BottomNavigationBarLandscapeLayout.centered,
+            items: [
+              BottomNavigationBarItem(icon: Icon(Icons.home, size: 30), label: 'Home'),
+              BottomNavigationBarItem(icon: Icon(Icons.calendar_month, size: 30), label: 'Calendar'),
+              BottomNavigationBarItem(icon: Icon(Icons.wallet, size: 30), label: 'Budget'),
+              BottomNavigationBarItem(icon: Icon(Icons.schedule, size: 30), label: 'Itinerary'),
+              BottomNavigationBarItem(icon: Icon(Icons.person_add, size: 30), label: 'Collaborate'),
+              BottomNavigationBarItem(icon: Icon(Icons.settings, size: 30), label: 'Settings')
+            ]
+          ),
+        )
+      );
   }
 }
