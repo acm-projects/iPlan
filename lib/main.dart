@@ -10,6 +10,8 @@ import 'Calendar/calendar.dart';
 import 'Home_Page/eventHome.dart';
 import 'Settings/settings.dart';
 
+import 'home.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -29,7 +31,7 @@ class MyApp extends StatelessWidget{
             ),
           ),
         ),
-        home: Budget(),
+        home: Home(),
     );
   }
 }
