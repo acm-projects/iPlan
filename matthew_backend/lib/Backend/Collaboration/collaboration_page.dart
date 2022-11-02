@@ -205,7 +205,7 @@ class CollaborationPage {
     }
   }
 
-  /// Deconstructs the current [CollaborationPage] object in a JSON format
+  /// Converts the current [CollaborationPage] object into a json file formatted [Map]
   Map<String, dynamic> toJson() {
     return {
       "date": _date,

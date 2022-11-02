@@ -83,7 +83,7 @@ class User {
     return _events;
   }
 
-  /// Converts the current [User] object into a json file formatted map
+  /// Converts the current [User] object into a json file formatted [Map]
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       "name": _userName,

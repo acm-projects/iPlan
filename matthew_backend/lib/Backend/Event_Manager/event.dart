@@ -1,4 +1,5 @@
 import '../Collaboration/collaboration_page.dart';
+import '../Finance/finance_page.dart';
 import '../User_Creation/user.dart';
 
 /// @author [MatthewSheldon]
@@ -9,7 +10,7 @@ class Event {
   late String _link;
 
   /// The [FinancePage] object for this [Event] object
-  //late FinancePage _financePage;
+  late FinancePage _financePage;
 
   /// The [CalendarPage] object for this [Event] object
   //late CalendarPage _calendarPage;
@@ -36,7 +37,7 @@ class Event {
   /// Constructs an [Event] object from the passed json file and event id (link)
   Event.fromJson({required Map<String, dynamic> json, required String link}) {
     _link = link;
-    // _financePage = FinancePage.fromJson(json: json["financePage"]);
+    _financePage = FinancePage.fromJson(json: json["financePage"]);
     // _calendarPage = CalendarPage.fromJson(json: json["calendarPage"]);
     // _itineraryPage = ItineraryPage.fromJson(json: json["itineraryPage"]);
     _collaborationPage =
@@ -49,9 +50,9 @@ class Event {
   }
 
   /// Returns this [Event] object's [FinancePage] object
-  // FinancePage getFinancePage() {
-  //   return _financePage;
-  // }
+  FinancePage getFinancePage() {
+    return _financePage;
+  }
 
   /// Returns this [Event] object's [CalendarPage] object
   // CalendarPage getCalendarPage() {
@@ -68,11 +69,10 @@ class Event {
     return _collaborationPage;
   }
 
-  /// Converts the current [Event] object into a json file formatted map
+  /// Converts the current [Event] object into a json file formatted [Map]
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
-      //"financePage": _financePage.toJson();
-      "financePage": "{}",
+      "financePage": _financePage.toJson(),
       //"calendarPage": _calendarPage.toJson();
       "calendarPage": "{}",
       //"itineraryPage": _itineraryPage.toJson();
