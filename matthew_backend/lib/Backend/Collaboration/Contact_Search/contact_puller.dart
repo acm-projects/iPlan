@@ -4,9 +4,9 @@ import 'package:permission_handler/permission_handler.dart';
 
 /// @author [MatthewSheldon]
 /// A class that handles the monitoring and requesting of contact permissions
-/// via the [Permission] class from the [contacts_service.dart] API. 
-/// Additionally, [ContactPuller] is able to retrieve a list of [Contact] objects
-/// which is returned from the native OS's contacts app once contact permissions
+/// via the [Permission] class from the [contacts_service] API. Additionally, 
+/// [ContactPuller] is able to retrieve a list of [Contact] objects which is 
+/// returned from the native OS's contacts app once contact permissions
 /// have been granted by the user. 
 class ContactPuller {
   /// Constructs a [ContactPuller] object after having ensured that all 

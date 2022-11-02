@@ -22,8 +22,7 @@ class CollaborationPage {
   late List<Contact> _contacts;
 
   /// The mapping between names of contacts and [Contact] objects
-  late ContactMap
-      _contactMap; // TODO: remove [ContactMap] if it is no longer a needed class
+  late ContactMap _contactMap;
 
   /// The tool used to request contact permissions and scrape the user's contacts
   late ContactPuller _contactPuller;
@@ -115,6 +114,21 @@ class CollaborationPage {
     return _contactPermissionsEnabled ? _collaborators : <Collaborator>[];
   }
 
+  /// Returns a list of names that match the [substring] parameter.
+  List<String> getNamesFromSearch({required String substring}) {
+    return _contactPermissionsEnabled
+        ? _contactMap.getNamesThatContain(substring: substring)
+        : <String>[];
+  }
+
+  /// Returns a list of Contacts that match the [substring] parameter.
+  List<Contact> getContactsFromSearch({required String substring}) {
+    return _contactPermissionsEnabled
+        ? _contactMap.getContactsFromNames(
+            names: getNamesFromSearch(substring: substring))
+        : <Contact>[];
+  }
+
   /// Returns a [String] representation of the passed [contact] parameter
   String contactToString({required Contact contact}) {
     String output =
@@ -181,12 +195,11 @@ class CollaborationPage {
   /// parameter with the information contained in the passed [User] object
   void updateCollaborator({required String oldUserID, required User user}) {
     for (int i = 0; i < _collaborators.length; i++) {
-      Collaborator collaborator = _collaborators[i];
-      if (collaborator.getUserID() == oldUserID) {
-        collaborator.updateUserID(userID: user.getUserID());
-        collaborator.updateEmail(email: user.getEmail());
-        collaborator.updateName(name: user.getUserName());
-        collaborator.updateHasAccepted(hasAccepted: true);
+      if (_collaborators[i].getUserID() == oldUserID) {
+        _collaborators[i].updateUserID(userID: user.getUserID());
+        _collaborators[i].updateEmail(email: user.getEmail());
+        _collaborators[i].updateName(name: user.getUserName());
+        _collaborators[i].updateHasAccepted(hasAccepted: true);
         break;
       }
     }

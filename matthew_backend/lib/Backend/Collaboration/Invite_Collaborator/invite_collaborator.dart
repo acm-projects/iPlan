@@ -14,7 +14,7 @@ class InviteCollaborator {
         queryParameters: <String, String>{
           "body": "You have been invited to an iPlan event.\n"
             "Upon downloading the iPlan app, on the event organization screen,"
-            "paste the following link to be added as a collaborator: $link"
+            " enter the following link to be added as a collaborator: $link"
         });
     launchUrl(smsLaunchUri);
   }
@@ -29,7 +29,7 @@ class InviteCollaborator {
         query: _encodeQueryParameters(<String, String>{
           "subject": "You have been invited to an iPlan event",
           "body": "Upon downloading the iPlan app, on the event organization screen,"
-            "paste the following link to be added as a collaborator: $link"
+            " enter the following link to be added as a collaborator: $link"
         }));
     launchUrl(emailLaunchUri);
   }

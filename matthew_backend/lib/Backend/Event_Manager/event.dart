@@ -20,6 +20,19 @@ class Event {
   /// The [CollaborationPage] object for this [Event] object
   late CollaborationPage _collaborationPage;
 
+  /// Constructs an [Event] object from the passed [eventID], [title], and [date]
+  /// and adds the [user] to the event.
+  Event(
+      {required String eventID,
+      required User user,
+      required String title,
+      required String date}) {
+    _link = eventID;
+    _collaborationPage =
+        CollaborationPage(title: title, date: date, link: eventID);
+    _collaborationPage.addCollaboratorFromUser(user: user);
+  }
+
   /// Constructs an [Event] object from the passed json file and event id (link)
   Event.fromJson({required Map<String, dynamic> json, required String link}) {
     _link = link;
@@ -75,7 +88,7 @@ class Event {
   }
 
   /// Adds the [User] object described by [user] as a [Collaborator] object
-  /// in the event's list of collaborators 
+  /// in the event's list of collaborators
   void addCollaboratorFromUser({required User user}) {
     _collaborationPage.addCollaboratorFromUser(user: user);
   }
