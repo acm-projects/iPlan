@@ -27,8 +27,10 @@ class Event {
       {required String eventID,
       required User user,
       required String title,
-      required String date}) {
+      required String date,
+      required double budget}) {
     _link = eventID;
+    _financePage = FinancePage(totalBudget: budget);
     _collaborationPage =
         CollaborationPage(title: title, date: date, link: eventID);
     _collaborationPage.addCollaboratorFromUser(user: user);

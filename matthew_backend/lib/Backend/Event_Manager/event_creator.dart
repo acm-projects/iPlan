@@ -41,6 +41,7 @@ class EventCreator {
   static Future<List<dynamic>> createEvent(
       {required String eventName,
       required String date,
+      required double budget,
       required User user}) async {
     WidgetsFlutterBinding.ensureInitialized();
     await Firebase.initializeApp();
@@ -60,7 +61,7 @@ class EventCreator {
 
     // Create a new event object
     Event event =
-        Event(title: eventName, date: date, eventID: eventID, user: user);
+        Event(title: eventName, date: date, eventID: eventID, user: user, budget: budget);
 
     // Add the event and event ID to the User object
     user.addEvent(event: event);
