@@ -4,6 +4,7 @@ import 'package:matthew_backend/Backend/Authentication/log_in_authentication.dar
 import 'package:matthew_backend/Backend/Event_Manager/event_creator.dart';
 import 'package:matthew_backend/Backend/User_Creation/user_assembler.dart';
 import 'package:matthew_backend/Backend/User_Creation/user_creator.dart';
+import 'package:matthew_backend/Frontend/Event_Manager/events_home_page.dart';
 
 import 'Backend/Event_Manager/event.dart';
 import 'Backend/User_Creation/user.dart';
@@ -17,7 +18,34 @@ import 'Frontend/Home_Page/eventHome.dart';
 import 'Frontend/Settings/settings.dart';
 import 'Backend/Authentication/invite_user.dart';
 
+late User user;
+
 void main() async {
+  String? userID = await LogInAuthentication.logInWithEmail(
+      email: "jon.perry@gmail.com", password: "absolute_legend");
+
+  UserAssembler userAssembler = UserAssembler(userID: userID!);
+  List<dynamic> ans = await userAssembler.assembleUserFromCloud();
+
+  if (ans[0] == UserAssembler.success) {
+    user = ans[1];
+  }
+
+  print(ans[0]);
+
+  // ans = await EventCreator.createEvent(
+  //     eventName: "iPlan test 2.0",
+  //     budget: 15999.99,
+  //     date: DateTime(2022, 11, 5),
+  //     startTime: TimeOfDay(hour: 7, minute: 30),
+  //     endTime: TimeOfDay(hour: 15, minute: 45),
+  //     user: user);
+
+  for (Event event in user.getEvents()) {
+    var json = event.toJson();
+    print(json);
+  }
+
   runApp(MyApp());
 }
 
@@ -37,7 +65,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: Register(),
+      home: EventsHomePage(user: user),
     );
   }
 }

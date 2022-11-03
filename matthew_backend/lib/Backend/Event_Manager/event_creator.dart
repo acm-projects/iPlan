@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import 'event.dart';
@@ -40,8 +41,10 @@ class EventCreator {
   /// will be returned along with the [Event] object created.
   static Future<List<dynamic>> createEvent(
       {required String eventName,
-      required String date,
       required double budget,
+      required DateTime date,
+      required TimeOfDay startTime,
+      required TimeOfDay endTime,
       required User user}) async {
     WidgetsFlutterBinding.ensureInitialized();
     await Firebase.initializeApp();
@@ -50,8 +53,7 @@ class EventCreator {
 
     // Attempt to create a new event document in the collection "events" in the cloud
     try {
-      eventID =
-          await FirebaseFirestore.instance.collection("events").doc().id;
+      eventID = await FirebaseFirestore.instance.collection("events").doc().id;
     } catch (e) {
       // The operation failed
       print(e);
@@ -60,8 +62,14 @@ class EventCreator {
     }
 
     // Create a new event object
-    Event event =
-        Event(title: eventName, date: date, eventID: eventID, user: user, budget: budget);
+    Event event = Event(
+        eventID: eventID,
+        user: user,
+        title: eventName,
+        date: date,
+        startTime: startTime,
+        endTime: endTime,
+        budget: budget);
 
     // Add the event and event ID to the User object
     user.addEvent(event: event);
