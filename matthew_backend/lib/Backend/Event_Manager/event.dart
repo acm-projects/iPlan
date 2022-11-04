@@ -92,7 +92,7 @@ class Event {
     return "${months[_date.month - 1]} ${_date.day}, ${_date.year}";
   }
 
-  /// Helper method for [Event.fromJson] constructor that takes a [TimeOfDay] 
+  /// Helper method for [Event.fromJson] constructor that takes a [TimeOfDay]
   /// formatted [String] and returns the converted [TimeOfDay] equivalent object.
   TimeOfDay _getTimeFromString(String time) {
     List<String> split = time.split(":");
@@ -170,5 +170,11 @@ class Event {
   /// in the event's list of collaborators
   void addCollaboratorFromUser({required User user}) {
     _collaborationPage.addCollaboratorFromUser(user: user);
+  }
+
+  /// Updates this object's instance of [_collaborationPage] with the passed
+  /// [collaborationPage] updated [CollaborationPage] object.
+  void updateCollaborationPage({required CollaborationPage collaborationPage}) {
+    _collaborationPage = collaborationPage;
   }
 }

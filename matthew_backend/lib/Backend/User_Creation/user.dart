@@ -58,6 +58,15 @@ class User {
     _events.add(event);
   }
 
+  /// Updates the passed [event] in the [_events] list given the passed [eventID]
+  void updateEvent({required String eventID, required Event event}) {
+    for (int i = 0; i < _events.length; i++) {
+      if (_eventIDs[i] == eventID) {
+        _events[i] = event;
+      }
+    }
+  }
+
   /// Returns the user's ID
   String getUserID() {
     return _userID;

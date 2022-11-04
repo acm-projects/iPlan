@@ -1,6 +1,15 @@
+/*
+  TODO: getBudgetList() to initialize the _budgetList (right now, the initial budgetList only includes discretionary budget)
+  Line 298: where category is created
+  Line 456: where category is deleted
+  Line 777: where expense is added
+  Line 924: where category is edited
+ */
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/services.dart';
 
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -13,7 +22,7 @@ class _BudgetState extends State<Budget> {
   List<Color> colors = [Color(0xFF8E65E3), Color(0xFFE38E65), Color(0xFF65E38E), Color(0xFF65BAE3), Color(0xFFE3CD65), Color(0xFFE3657B), Color(0xFF65E3CD), Color(0xFFFFA500)];
   int colorsIndex = 0;
 
-  late List<BudgetData> _chartData;
+  late List<BudgetData> _budgetList;
   late TooltipBehavior _tooltipBehavior;
   var f = NumberFormat("\$###,##0.00");
   double budget = 12000;
@@ -29,17 +38,17 @@ class _BudgetState extends State<Budget> {
   @override
   void initState(){
     _tooltipBehavior = TooltipBehavior(enable: true);
-    _chartData = getChartData();
+    _budgetList = getBudgetList();
     updateBudgetVals();
     super.initState();
   }
 
   void updateBudgetVals(){
     spent = 0;
-    for (var i = 0; i < _chartData.length - 1; i++) {
-      spent += _chartData[i].budget;
+    for (var i = 0; i < _budgetList.length - 1; i++) {
+      spent += _budgetList[i].budget;
     }
-    _chartData[_chartData.length - 1].budget = budget - spent;
+    _budgetList[_budgetList.length - 1].budget = budget - spent;
     percent = spent / budget * 100;
   }
 
@@ -190,7 +199,7 @@ class _BudgetState extends State<Budget> {
                           tooltipBehavior: _tooltipBehavior,
                           series: <CircularSeries>[
                             DoughnutSeries<BudgetData, String>(
-                              dataSource: _chartData,
+                              dataSource: _budgetList,
                               pointColorMapper: (BudgetData data,_) => data.color,
                               xValueMapper: (BudgetData data,_) => data.category,
                               yValueMapper: (BudgetData data,_) => data.budget,
@@ -223,15 +232,15 @@ class _BudgetState extends State<Budget> {
                       ),
                     ),
                     SizedBox(height: 10),
-                    for(var i = 0; i < _chartData.length - 1; i++)(
+                    for(var i = 0; i < _budgetList.length - 1; i++)(
                       Column(
                         children: [
-                          budgetCategory(_chartData[i]),
+                          budgetCategory(_budgetList[i]),
                         ],
                       )
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(15.0),
+                      padding: const EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 0.0),
                       child: FloatingActionButton.extended(
                         onPressed: (){
                           showModalBottomSheet(
@@ -288,9 +297,10 @@ class _BudgetState extends State<Budget> {
                                               ),
                                               color: Color.fromRGBO(186, 227, 101, 1),
                                               onPressed: () {
+                                                //TODO: where category is created
                                                 if (isAmountValid(_categoryBudgetController)){
                                                   if (!(_categoryController.text.isEmpty || _categoryBudgetController.text.isEmpty)) {
-                                                    _chartData.insert(_chartData.length - 1, new BudgetData(_categoryController.text, double.parse(_categoryBudgetController.text), colors[colorsIndex]));
+                                                    _budgetList.insert(_budgetList.length - 1, new BudgetData(_categoryController.text, double.parse(_categoryBudgetController.text), colors[colorsIndex]));
                                                   }
                                                   if (colorsIndex < 7){
                                                     colorsIndex++;
@@ -319,6 +329,9 @@ class _BudgetState extends State<Budget> {
                                           child: Padding(
                                             padding: const EdgeInsets.only(left: 10.0),
                                             child: TextField(
+                                              inputFormatters: [
+                                                LengthLimitingTextInputFormatter(20),
+                                              ],
                                               controller: _categoryController,
                                               style: GoogleFonts.lato(
                                                 color: Colors.black,
@@ -345,6 +358,9 @@ class _BudgetState extends State<Budget> {
                                           child: Padding(
                                             padding: const EdgeInsets.only(left: 10.0),
                                             child: TextField(
+                                              inputFormatters: [
+                                                LengthLimitingTextInputFormatter(20),
+                                              ],
                                               controller: _categoryBudgetController,
                                               style: GoogleFonts.lato(
                                                 color: Colors.black,
@@ -380,7 +396,8 @@ class _BudgetState extends State<Budget> {
                       ),
                     ),
                     SizedBox(height: 10),
-                    if (_chartData.length > 1) ...[
+                    //delete button
+                    if (_budgetList.length > 1) ...[
                       Padding(
                         padding: const EdgeInsets.all(15.0),
                         child: FloatingActionButton.extended(
@@ -438,8 +455,9 @@ class _BudgetState extends State<Budget> {
                                                 ),
                                                 color: Color.fromRGBO(186, 227, 101, 1),
                                                 onPressed: () {
+                                                  //TODO: deletes category
                                                   if (isCategoryValid(_categoryController)){
-                                                    _chartData.remove(getCategory(_categoryController));
+                                                    _budgetList.remove(getCategory(_categoryController));
                                                     updateBudgetVals();
                                                     Navigator.pop(context);
                                                   }
@@ -460,6 +478,9 @@ class _BudgetState extends State<Budget> {
                                             child: Padding(
                                               padding: const EdgeInsets.only(left: 10.0),
                                               child: TextField(
+                                                inputFormatters: [
+                                                  LengthLimitingTextInputFormatter(20),
+                                                ],
                                                 controller: _categoryController,
                                                 style: GoogleFonts.lato(
                                                   color: Colors.black,
@@ -494,7 +515,8 @@ class _BudgetState extends State<Budget> {
                           foregroundColor: Colors.black,
                         ),
                       ),
-                    ]
+                    ],
+                    SizedBox(height: 15),
                   ],
                 ),
               ),
@@ -502,24 +524,10 @@ class _BudgetState extends State<Budget> {
           ),
         ],
       ),
-      //Navigation Bar with Icons
-      bottomNavigationBar: BottomNavigationBar(
-          showSelectedLabels: false,
-          showUnselectedLabels: false,
-          landscapeLayout: BottomNavigationBarLandscapeLayout.centered,
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(icon: Icon(Icons.home, color: Colors.black, size: 30), label: 'Home', backgroundColor: Color(0xFFA3B0EB)),
-            BottomNavigationBarItem(icon: Icon(Icons.calendar_month, color: Colors.black, size: 30), label: 'Calendar', backgroundColor: Color(0xFFA3B0EB)),
-            BottomNavigationBarItem(icon: Icon(Icons.wallet, color: Colors.black, size: 30), label: 'Budget', backgroundColor: Color(0xFFA3B0EB)),
-            BottomNavigationBarItem(icon: Icon(Icons.schedule, color: Colors.black, size: 30), label: 'Itinerary', backgroundColor: Color(0xFFA3B0EB)),
-            BottomNavigationBarItem(icon: Icon(Icons.person_add, color: Colors.black, size: 30), label: 'Collaborate', backgroundColor: Color(0xFFA3B0EB)),
-            BottomNavigationBarItem(icon: Icon(Icons.settings, color: Colors.black, size: 30), label: 'Settings', backgroundColor: Color(0xFFA3B0EB))
-          ]
-      ),
     );
   }
 
-  List<BudgetData> getChartData(){
+  List<BudgetData> getBudgetList(){
     List<BudgetData> chartData = [
       BudgetData('Discretionary', 0, Color(0xFFE7E7E7))
     ];
@@ -694,143 +702,306 @@ class _BudgetState extends State<Budget> {
             SizedBox(height: 10),
             expensesList(category),
             SizedBox(height: 10),
-            FloatingActionButton.extended(
-              onPressed: (){
-                showModalBottomSheet(
-                  isScrollControlled: true,
-                  context: context,
-                  builder: (context) => SingleChildScrollView(
-                    child: Container(
-                      padding: EdgeInsets.only(
-                        bottom: MediaQuery.of(context).viewInsets.bottom,
-                      ),
-                      child: Container(
-                        color: Color(0xff757575),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FloatingActionButton.extended(
+                  onPressed: (){
+                    showModalBottomSheet(
+                      isScrollControlled: true,
+                      context: context,
+                      builder: (context) => SingleChildScrollView(
                         child: Container(
-                          padding: EdgeInsets.all(20.0),
-                          decoration: BoxDecoration(
-                            color: Color.fromRGBO(101, 123, 227, 1),
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(20.0),
-                              topRight: Radius.circular(20.0),
-                            ),
+                          padding: EdgeInsets.only(
+                            bottom: MediaQuery.of(context).viewInsets.bottom,
                           ),
-                          child: Column(
-                            children: <Widget>[
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(
-                                      size: 40.0,
-                                      Icons.close,
-                                    ),
-                                    color: Color.fromRGBO(186, 227, 101, 1),
-                                    onPressed: (){
-                                      _expenseController.clear();
-                                      _amountController.clear();
-                                      Navigator.pop(context);
-                                    },
+                          child: Container(
+                            color: Color(0xff757575),
+                            child: Container(
+                              padding: EdgeInsets.all(20.0),
+                              decoration: BoxDecoration(
+                                color: Color.fromRGBO(101, 123, 227, 1),
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(20.0),
+                                  topRight: Radius.circular(20.0),
+                                ),
+                              ),
+                              child: Column(
+                                children: <Widget>[
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(
+                                          size: 40.0,
+                                          Icons.close,
+                                        ),
+                                        color: Color.fromRGBO(186, 227, 101, 1),
+                                        onPressed: (){
+                                          _expenseController.clear();
+                                          _amountController.clear();
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                      SizedBox(height: 10),
+                                      Text(
+                                        "Add Expense",
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.lato(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 30.0,
+                                          color: Color.fromRGBO(254, 247, 236, 1),
+                                        ),
+                                      ),
+                                      SizedBox(height: 10),
+                                      IconButton(
+                                        icon: const Icon(
+                                          size: 40.0,
+                                          Icons.check_circle,
+                                        ),
+                                        color: Color.fromRGBO(186, 227, 101, 1),
+                                        onPressed: () {
+                                          //TODO: adds expense
+                                          if (!(_expenseController.text.isEmpty || _amountController.text.isEmpty)) {
+                                            category.expenses.add(new Expense(_expenseController.text, double.parse(_amountController.text)));
+                                          }
+                                          updateExpenseVals(category);
+                                          Navigator.pop(context);
+                                          _expenseController.clear();
+                                          _amountController.clear();
+                                          setState((){});
+                                          return;
+                                        },
+                                      ),
+                                    ],
                                   ),
-                                  SizedBox(height: 10),
-                                  Text(
-                                    "Add Expense",
-                                    textAlign: TextAlign.center,
-                                    style: GoogleFonts.lato(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 30.0,
+                                  SizedBox(height: 25),
+                                  //expense name
+                                  Container(
+                                    decoration: BoxDecoration(
                                       color: Color.fromRGBO(254, 247, 236, 1),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 10.0),
+                                      child: TextField(
+                                        inputFormatters: [
+                                          LengthLimitingTextInputFormatter(20),
+                                        ],
+                                        controller: _expenseController,
+                                        style: GoogleFonts.lato(
+                                          color: Colors.black,
+                                        ),
+                                        cursorColor: Colors.black,
+                                        decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                          hintText: 'Expense Name',
+                                          prefixIcon: Icon(
+                                            Icons.add_shopping_cart,
+                                            color: Color(0xFF657BE3),
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                   SizedBox(height: 10),
-                                  IconButton(
-                                    icon: const Icon(
-                                      size: 40.0,
-                                      Icons.check_circle,
+                                  //expense amount
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: Color.fromRGBO(254, 247, 236, 1),
+                                      borderRadius: BorderRadius.circular(20),
                                     ),
-                                    color: Color.fromRGBO(186, 227, 101, 1),
-                                    onPressed: () {
-                                      if (!(_expenseController.text.isEmpty || _amountController.text.isEmpty)) {
-                                        category.expenses.add(new Expense(_expenseController.text, double.parse(_amountController.text)));
-                                      }
-                                      updateExpenseVals(category);
-                                      Navigator.pop(context);
-                                      _expenseController.clear();
-                                      _amountController.clear();
-                                      setState((){});
-                                      return;
-                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 10.0),
+                                      child: TextFormField(
+                                        inputFormatters: [
+                                          LengthLimitingTextInputFormatter(20),
+                                        ],
+                                        controller: _amountController,
+                                        style: GoogleFonts.lato(
+                                          color: Colors.black,
+                                        ),
+                                        cursorColor: Colors.black,
+                                        decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                          hintText: 'Expense Amount',
+                                          prefixIcon: Icon(
+                                            Icons.attach_money,
+                                            color: Color(0xFF657BE3),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                   ),
+                                  SizedBox(height: 10),
                                 ],
                               ),
-                              SizedBox(height: 25),
-                              //expense name
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Color.fromRGBO(254, 247, 236, 1),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 10.0),
-                                  child: TextField(
-                                    controller: _expenseController,
-                                    style: GoogleFonts.lato(
-                                      color: Colors.black,
-                                    ),
-                                    cursorColor: Colors.black,
-                                    decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      hintText: 'Expense Name',
-                                      prefixIcon: Icon(
-                                        Icons.add_shopping_cart,
-                                        color: Color(0xFF657BE3),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 10),
-                              //expense amount
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Color.fromRGBO(254, 247, 236, 1),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 10.0),
-                                  child: TextFormField(
-                                    controller: _amountController,
-                                    style: GoogleFonts.lato(
-                                      color: Colors.black,
-                                    ),
-                                    cursorColor: Colors.black,
-                                    decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      hintText: 'Expense Amount',
-                                      prefixIcon: Icon(
-                                        Icons.attach_money,
-                                        color: Color(0xFF657BE3),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 10),
-                            ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                    );
+                  },
+                  label: Text(
+                    "Add Expense",
+                    style: GoogleFonts.lato(),
                   ),
-                );
-              },
-              label: Text(
-                "Add Expense",
-                style: GoogleFonts.lato(),
-              ),
-              icon: Icon(Icons.add),
-              backgroundColor: category.color,
-              foregroundColor: Color(0xFFFEF7EC),
+                  icon: Icon(Icons.add),
+                  backgroundColor: category.color,
+                  foregroundColor: Color(0xFFFEF7EC),
+                ),
+                SizedBox(width: 75),
+                FloatingActionButton.extended(
+                  onPressed: (){
+                    showModalBottomSheet(
+                      isScrollControlled: true,
+                      context: context,
+                      builder: (context) => SingleChildScrollView(
+                        child: Container(
+                          padding: EdgeInsets.only(
+                            bottom: MediaQuery.of(context).viewInsets.bottom,
+                          ),
+                          child: Container(
+                            color: Color(0xff757575),
+                            child: Container(
+                              padding: EdgeInsets.all(20.0),
+                              decoration: BoxDecoration(
+                                color: Color.fromRGBO(101, 123, 227, 1),
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(20.0),
+                                  topRight: Radius.circular(20.0),
+                                ),
+                              ),
+                              child: Column(
+                                children: <Widget>[
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(
+                                          size: 40.0,
+                                          Icons.close,
+                                        ),
+                                        color: Color.fromRGBO(186, 227, 101, 1),
+                                        onPressed: (){
+                                          _categoryController.clear();
+                                          _categoryBudgetController.clear();
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                      SizedBox(height: 10),
+                                      Text(
+                                        "Edit Category",
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.lato(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 30.0,
+                                          color: Color.fromRGBO(254, 247, 236, 1),
+                                        ),
+                                      ),
+                                      SizedBox(height: 10),
+                                      IconButton(
+                                        icon: const Icon(
+                                          size: 40.0,
+                                          Icons.check_circle,
+                                        ),
+                                        color: Color.fromRGBO(186, 227, 101, 1),
+                                        onPressed: () {
+                                          //TODO: edits category name and/or budget
+                                          if (_categoryController.text.isNotEmpty){
+                                            category.category = _categoryController.text;
+                                          }
+                                          if (_categoryBudgetController.text.isNotEmpty){
+                                            if (isAmountValid(_categoryBudgetController)) {
+                                              category.budget = double.parse(_categoryBudgetController.text);
+                                              updateBudgetVals();
+                                            }
+                                          }
+                                          Navigator.pop(context);
+                                          _categoryController.clear();
+                                          _categoryBudgetController.clear();
+                                          setState((){});
+                                          return;
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 25),
+                                  //category name
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: Color.fromRGBO(254, 247, 236, 1),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 10.0),
+                                      child: TextField(
+                                        inputFormatters: [
+                                          LengthLimitingTextInputFormatter(20),
+                                        ],
+                                        controller: _categoryController,
+                                        style: GoogleFonts.lato(
+                                          color: Colors.black,
+                                        ),
+                                        cursorColor: Colors.black,
+                                        decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                          hintText: 'Edit Category Name',
+                                          prefixIcon: Icon(
+                                            Icons.category,
+                                            color: Color(0xFF657BE3),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 10),
+                                  //budget amount
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: Color.fromRGBO(254, 247, 236, 1),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 10.0),
+                                      child: TextField(
+                                        inputFormatters: [
+                                          LengthLimitingTextInputFormatter(20),
+                                        ],
+                                        controller: _categoryBudgetController,
+                                        style: GoogleFonts.lato(
+                                          color: Colors.black,
+                                        ),
+                                        cursorColor: Colors.black,
+                                        decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                          hintText: 'Edit Budget Amount',
+                                          prefixIcon: Icon(
+                                            Icons.attach_money,
+                                            color: Color(0xFF657BE3),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 10),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                  label: Text(
+                    "Edit Category",
+                    style: GoogleFonts.lato(),
+                  ),
+                  icon: Icon(Icons.edit),
+                  backgroundColor: category.color,
+                  foregroundColor: Color.fromRGBO(254, 247, 236, 1),
+                ),
+              ],
             ),
             SizedBox(height: 20),
           ],
@@ -897,8 +1068,8 @@ class _BudgetState extends State<Budget> {
   }
 
   bool isCategoryValid(TextEditingController controller){
-    for (var i = 0; i < _chartData.length; i++){
-      if (_chartData[i].category == controller.text){
+    for (var i = 0; i < _budgetList.length; i++){
+      if (_budgetList[i].category == controller.text){
         return true;
       }
     }
@@ -906,12 +1077,12 @@ class _BudgetState extends State<Budget> {
   }
 
   BudgetData getCategory(TextEditingController controller){
-    for (var i = 0; i < _chartData.length; i++){
-      if (_chartData[i].category == controller.text){
-        return _chartData[i];
+    for (var i = 0; i < _budgetList.length; i++){
+      if (_budgetList[i].category == controller.text){
+        return _budgetList[i];
       }
     }
-    return _chartData[0];
+    return _budgetList[0];
   }
 }
 

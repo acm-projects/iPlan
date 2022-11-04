@@ -324,7 +324,6 @@ class _EventsHomeState extends State<EventsHomePage> {
                                                           const EdgeInsets.all(
                                                               8.0),
                                                       child: EventEndTime()),
-
                                                   //This listTile contains the Close and Create buttons at the bottom of the popup
                                                   ListTile(
                                                       //Close button is leading

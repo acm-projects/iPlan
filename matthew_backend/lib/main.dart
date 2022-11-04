@@ -1,24 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:matthew_backend/Backend/Authentication/log_in_authentication.dart';
-import 'package:matthew_backend/Backend/Event_Manager/event_creator.dart';
-import 'package:matthew_backend/Backend/User_Creation/user_assembler.dart';
-import 'package:matthew_backend/Backend/User_Creation/user_creator.dart';
-import 'package:matthew_backend/Frontend/Event_Manager/events_home_page.dart';
 
+import 'Backend/Authentication/log_in_authentication.dart';
 import 'Backend/Event_Manager/event.dart';
 import 'Backend/User_Creation/user.dart';
-import 'Frontend/Authentication/login.dart';
-import 'Frontend/Authentication/register.dart';
-import 'Frontend/Authentication/forgotPass.dart';
+import 'Backend/User_Creation/user_assembler.dart';
 
-import 'Frontend/Finance/budget.dart';
-import 'Frontend/Calendar/calendar.dart';
-import 'Frontend/Home_Page/eventHome.dart';
-import 'Frontend/Settings/settings.dart';
-import 'Backend/Authentication/invite_user.dart';
+import 'Frontend/Collaboration/collaboration.dart';
 
 late User user;
+
+late Event event;
 
 void main() async {
   String? userID = await LogInAuthentication.logInWithEmail(
@@ -41,10 +33,9 @@ void main() async {
   //     endTime: TimeOfDay(hour: 15, minute: 45),
   //     user: user);
 
-  for (Event event in user.getEvents()) {
-    var json = event.toJson();
-    print(json);
-  }
+  event = user.getEvents()[0];
+  await event.getCollaborationPage().constructorHelperMethod();
+  print(event.toJson());
 
   runApp(MyApp());
 }
@@ -65,7 +56,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: EventsHomePage(user: user),
+      home: Collaboration(user: user, event: event),
     );
   }
 }

@@ -1,12 +1,42 @@
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-import '../../Backend/Collaboration/Invite_Collaborator/invite_collaborator.dart';
+import '../../Backend/Authentication/invite_user.dart';
+import '../../Backend/Authentication/update_files.dart';
 import '../../Backend/Collaboration/collaboration_page.dart';
 import '../../Backend/Collaboration/Collaborator/collaborator.dart';
-import '../../Backend/Authentication/invite_user.dart';
-import 'package:google_fonts/google_fonts.dart';
+import '../../Backend/Collaboration/Invite_Collaborator/invite_collaborator.dart';
+import '../../Backend/Event_Manager/event.dart';
+import '../../Backend/User_Creation/user.dart';
+
+/// The [User] object that needs to be updated
+late User _user;
+
+/// The [Event] object that needs to be updated
+late Event _event;
+
+/// The [CollaborationPage] object of the current [User] object
+late CollaborationPage _collaborationPage;
+
+/// The [TextEditingController] to retrieve the name of the contact being added
+late TextEditingController _searchBarTextRetrieval;
+
+/// The list of names of contacts for the current device
+late List<String> _contacts;
+
+/// The contact that was selected
+String _selectedContact = "";
+
+/// Used to update the [Event] object in the cloud
+void _updateEventObject() async {
+  _event.updateCollaborationPage(collaborationPage: _collaborationPage);
+  _user.updateEvent(eventID: _event.getLink(), event: _event);
+  bool result = await UpdateFiles.updateEventFile(
+      documentID: _event.getLink(), json: _event.toJson());
+  print(result);
+}
 
 //CASI - Changed to GoogleFont style
 class CollaborateTitle extends StatelessWidget {
@@ -21,41 +51,147 @@ class CollaborateTitle extends StatelessWidget {
   }
 }
 
+//CASI - Turned Stateful
+class Collaboration extends StatefulWidget {
+  Collaboration({super.key, required User user, required Event event}) {
+    _user = user;
+    _event = event;
+    _collaborationPage = event.getCollaborationPage();
+    _searchBarTextRetrieval = TextEditingController();
+  }
+
+  @override
+  State<Collaboration> createState() => _CollaborationState();
+}
+
+class _CollaborationState extends State<Collaboration> {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+        title: 'iPlan',
+        home: Scaffold(
+          backgroundColor: Color(0xFF657BE3),
+          body: SingleChildScrollView(
+            child: Center(
+              child: Column(
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(0.0, 50.0, 0.0, 5.0),
+                    child: CollaborateTitle(),
+                  ),
+                  Padding(
+                      padding: EdgeInsets.fromLTRB(0.0, 9.0, 0.0, 0.0),
+                      //container widget that includes all other widgets
+                      child: WhiteSquare()),
+                ],
+              ),
+            ),
+          ),
+
+          //Casi - Changed Nav bar
+          bottomNavigationBar: BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
+              backgroundColor: Color(0xFFA3B0EB),
+              selectedItemColor: Color.fromRGBO(254, 247, 236, 1),
+              unselectedItemColor: Colors.black,
+              showSelectedLabels: true,
+              showUnselectedLabels: false,
+              landscapeLayout: BottomNavigationBarLandscapeLayout.centered,
+              items: [
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.home, size: 30), label: 'Home'),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.calendar_month, size: 30),
+                    label: 'Calendar'),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.wallet, size: 30), label: 'Budget'),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.schedule, size: 30), label: 'Itinerary'),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.person_add, size: 30),
+                    label: 'Collaborate'),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.settings, size: 30), label: 'Settings')
+              ]),
+        ));
+  }
+}
+
 //CASI - Changed to StatefulWidget
 class WhiteSquare extends StatefulWidget {
-  late InviteCollaborator inviteCollaborator;
-  late CollaborationPage collaborationPage;
-  late TextEditingController searchBarTextRetrieval = TextEditingController();
-
-  WhiteSquare(
-      {required this.inviteCollaborator,
-      required this.collaborationPage,
-      required this.searchBarTextRetrieval});
+  WhiteSquare({super.key});
 
   @override
   State<WhiteSquare> createState() => _WhiteSquareState();
 }
 
 class _WhiteSquareState extends State<WhiteSquare> {
-  late List<String> contacts;
-
-  String selectedContact = "";
+  /// @author [MatthewSheldon]
+  /// Method called when a collaborator is added to the event
+  Future _updateCollaborators({required String? value}) async {
+    // If the contact name entered is valid...
+    if (value != null) {
+      // Update the selected contact
+      _selectedContact = value;
+      // Retrieve the first contact with that name
+      Contact contact =
+          _collaborationPage.getContactsFromSearch(substring: value)[0];
+      // Retrieve their contact information
+      String contactInfo = (contact.emails!.isNotEmpty)
+          ? contact.emails![0].value!
+          : contact.phones![0].value!;
+      // Generate a temporary user ID
+      String tempUserID = await InviteUser.addCollaborator();
+      // Create a Collaborator object with that information
+      Collaborator collaborator = (contact.emails!.isNotEmpty)
+          ? Collaborator(
+              userID: tempUserID,
+              name: value,
+              email: contactInfo,
+              hasAccepted: false)
+          : Collaborator(
+              userID: tempUserID,
+              name: value,
+              phoneNumber: contactInfo,
+              hasAccepted: false);
+      // Add them to the list of collaborators
+      _collaborationPage.addCollaboratorFromCollaborator(
+          collaborator: collaborator);
+      //CASI - Set State
+      setState(() {});
+      (contact.emails!.isNotEmpty)
+          ? InviteCollaborator.sendEmail(
+              email: contactInfo,
+              link: _collaborationPage.getInviteLink() + tempUserID)
+          : InviteCollaborator.sendSMS(
+              phoneNumber: contactInfo,
+              link: _collaborationPage.getInviteLink() + tempUserID);
+      _updateEventObject();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    contacts = widget.collaborationPage.getNamesFromSearch(substring: "");
-    List<Collaborator> collaborators =
-        widget.collaborationPage.getCollaborators();
+    /// @author [MatthewSheldon]
+
+    // Get the list of contacts on the current device
+    _contacts = _collaborationPage.getNamesFromSearch(substring: "");
+
+    // Get the list of people who are already collaborators of the event
+    List<Collaborator> collaborators = _collaborationPage.getCollaborators();
     collaborators.sort();
+
+    // Construct the list of ListTile object that display the collaborators
     List<ListTile> collaboratorsToDisplay = <ListTile>[];
     for (Collaborator collaborator in collaborators) {
-      String contactInformation = "";
-      if (collaborator.getEmail() != "null") {
-        contactInformation = collaborator.getEmail();
-      } else if (collaborator.getPhoneNumber() != "null") {
-        contactInformation = collaborator.getPhoneNumber();
-      }
+      // Get the contact information to display
+      String contactInformation = collaborator.getEmail() != "null"
+          ? collaborator.getEmail()
+          : collaborator.getPhoneNumber() != "null"
+              ? collaborator.getPhoneNumber()
+              : "";
 
+      // Get the status of their acceptance and display the proper information
       Widget trailing = collaborator.hasAccepted()
           ? Text("Collaborator", style: GoogleFonts.lato())
           : Wrap(
@@ -66,6 +202,7 @@ class _WhiteSquareState extends State<WhiteSquare> {
               ],
             );
 
+      // Add the ListTile object to the list
       collaboratorsToDisplay.add(ListTile(
           contentPadding: EdgeInsets.symmetric(horizontal: 40.0),
           leading: const CircleAvatar(
@@ -77,6 +214,8 @@ class _WhiteSquareState extends State<WhiteSquare> {
           trailing: trailing));
       setState(() {});
     }
+
+    /// end @author [MatthewSheldon]
 
     return Container(
         height: 683.4,
@@ -99,10 +238,10 @@ class _WhiteSquareState extends State<WhiteSquare> {
                     ),
                     child: Column(
                       children: [
-                        Text("${widget.collaborationPage.getTitle()}",
+                        Text(_collaborationPage.getTitle(),
                             style: GoogleFonts.lato(
                                 fontSize: 20, fontWeight: FontWeight.bold)),
-                        Text("${widget.collaborationPage.getDate()}",
+                        Text(_collaborationPage.getDate(),
                             style: GoogleFonts.lato())
                       ],
                     )),
@@ -124,7 +263,7 @@ class _WhiteSquareState extends State<WhiteSquare> {
                       showSearchBox: true,
                       showClearButton: true,
                       showSelectedItems: true,
-                      items: contacts,
+                      items: _contacts,
                       dropdownSearchDecoration: InputDecoration(
                         labelText: "Search Contacts",
                         enabledBorder: OutlineInputBorder(
@@ -136,38 +275,7 @@ class _WhiteSquareState extends State<WhiteSquare> {
                         cursorColor: Color(0xFF657BE3),
                       ),
                       onChanged: (String? value) async {
-                        if (value != null) {
-                          selectedContact = value;
-                          Contact contact = widget.collaborationPage
-                              .getContactsFromSearch(substring: value)[0];
-                          String contactInfo = (contact.emails!.isNotEmpty)
-                              ? contact.emails![0].value!
-                              : contact.phones![0].value!;
-                          String tempUserID = await InviteUser.addCollaborator();
-                          Collaborator collaborator =
-                              (contact.emails!.isNotEmpty)
-                                  ? Collaborator(
-                                      userID: tempUserID,
-                                      name: value,
-                                      email: contactInfo,
-                                      hasAccepted: false)
-                                  : Collaborator(
-                                      userID: tempUserID,
-                                      name: value,
-                                      phoneNumber: contactInfo,
-                                      hasAccepted: false);
-                          collaborators.add(collaborator);
-                          setState(() {}); //CAsi - Set State
-                          (contact.emails!.isNotEmpty)
-                              ? widget.inviteCollaborator.sendEmail(
-                                  email: contactInfo,
-                                  link:
-                                      widget.collaborationPage.getInviteLink() + tempUserID)
-                              : widget.inviteCollaborator.sendSMS(
-                                  phoneNumber: contactInfo,
-                                  link:
-                                      widget.collaborationPage.getInviteLink() + tempUserID);
-                        }
+                        await _updateCollaborators(value: value);
                       },
                     )),
               ),
@@ -200,78 +308,5 @@ class _WhiteSquareState extends State<WhiteSquare> {
                     )),
               )
             ])));
-  }
-}
-
-//CASI - Turned Stateful
-class Collaboration extends StatefulWidget {
-  final InviteCollaborator? inviteCollaborator;
-  final CollaborationPage? collaborationPage;
-  final TextEditingController? searchBarTextRetrieval;
-  const Collaboration(
-      {super.key,
-      this.inviteCollaborator,
-      this.collaborationPage,
-      required this.searchBarTextRetrieval});
-
-  @override
-  State<Collaboration> createState() => _CollaborationState();
-}
-
-class _CollaborationState extends State<Collaboration> {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'iPlan',
-        home: Scaffold(
-          backgroundColor: Color(0xFF657BE3),
-          body: SingleChildScrollView(
-            child: Center(
-              child: Column(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(0.0, 50.0, 0.0, 5.0),
-                    child: CollaborateTitle(),
-                  ),
-                  Padding(
-                      padding: EdgeInsets.fromLTRB(0.0, 9.0, 0.0, 0.0),
-                      //container widget that includes all other widgets
-                      child: WhiteSquare(
-                        inviteCollaborator: this.widget.inviteCollaborator!,
-                        collaborationPage: this.widget.collaborationPage!,
-                        searchBarTextRetrieval:
-                            this.widget.searchBarTextRetrieval!,
-                      )),
-                ],
-              ),
-            ),
-          ),
-
-          //Casi - Changed Nav bar
-          bottomNavigationBar: BottomNavigationBar(
-              type: BottomNavigationBarType.fixed,
-              backgroundColor: Color(0xFFA3B0EB),
-              selectedItemColor: Color.fromRGBO(254, 247, 236, 1),
-              unselectedItemColor: Colors.black,
-              showSelectedLabels: true,
-              showUnselectedLabels: false,
-              landscapeLayout: BottomNavigationBarLandscapeLayout.centered,
-              items: [
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.home, size: 30), label: 'Home'),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.calendar_month, size: 30),
-                    label: 'Calendar'),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.wallet, size: 30), label: 'Budget'),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.schedule, size: 30), label: 'Itinerary'),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.person_add, size: 30),
-                    label: 'Collaborate'),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.settings, size: 30), label: 'Settings')
-              ]),
-        ));
   }
 }

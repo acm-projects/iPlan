@@ -191,6 +191,10 @@ class CollaborationPage {
     _collaborators.add(Collaborator.fromUser(user: user));
   }
 
+  void addCollaboratorFromCollaborator({required Collaborator collaborator}) {
+    _collaborators.add(collaborator);
+  }
+
   /// Updates the [Collaborator] object described by the passed [oldUserID]
   /// parameter with the information contained in the passed [User] object
   void updateCollaborator({required String oldUserID, required User user}) {
