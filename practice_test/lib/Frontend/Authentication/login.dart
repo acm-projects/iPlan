@@ -5,9 +5,9 @@ Line 109, has backend info
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:matthew_backend/Backend/Authentication/log_in_authentication.dart';
-import 'package:matthew_backend/Backend/User_Creation/user_assembler.dart';
 
+import '../../Backend/Authentication/log_in_authentication.dart';
+import '../../Backend/User_Creation/user_assembler.dart';
 import '../../Backend/User_Creation/user.dart';
 
 class Login extends StatefulWidget {

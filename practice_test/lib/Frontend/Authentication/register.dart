@@ -5,9 +5,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:matthew_backend/Backend/User_Creation/user_assembler.dart';
-import 'package:matthew_backend/Backend/User_Creation/user_creator.dart';
 
+import '../../Backend/User_Creation/user_assembler.dart';
+import '../../Backend/User_Creation/user_creator.dart';
 import '../../Backend/User_Creation/user.dart';
 
 class Register extends StatefulWidget {

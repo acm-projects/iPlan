@@ -40,13 +40,17 @@ dependencies:
   contacts_service: ^0.6.3
   url_launcher: ^6.1.6
   google_fonts: ^3.0.1
-  table_calendar: ^3.0.7
   dropdown_search: ^3.0.1
   json_serializable: ^6.5.3
   built_value: ^8.4.1
   cloud_firestore: ^3.1.5
   firebase_auth: ^3.11.2
-  syncfusion_flutter_calendar: ^20.3.49
+  table_calendar: ^3.0.7
+  intl: ^0.17.0
+  flutter_clean_calendar: ^1.1.0
+  date_picker_timeline: ^1.2.3
+  syncfusion_flutter_charts: ^20.3.50
+  expansion_card: ^0.1.0
 
 dev_dependencies:
   flutter_test:
