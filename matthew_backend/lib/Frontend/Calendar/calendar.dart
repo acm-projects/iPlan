@@ -10,37 +10,90 @@ order tasks from earliest time to latest time in selectedTasks
  */
 
 //can be replaced with backend task class, requires title, day, time, isComplete
-import '../Helpers/task.dart';
 
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../Backend/Authentication/update_files.dart';
+import '../../Backend/Calendar/task.dart';
+import '../../Backend/Calendar/calendar_page.dart';
+import '../../Backend/Event_Manager/event.dart';
+import '../../Backend/User_Creation/user.dart';
+
+/// @author [MatthewSheldon]
+/// The [User] object that is being updated
+late User _user;
+
+/// @author [MatthewSheldon]
+/// The [Event] object that is being updated
+late Event _event;
+
+/// @author [MatthewSheldon]
+/// The [CalendarPage] object for the current event
+late CalendarPage _calendarPage;
+
+/// map with date as key and list of tasks on that date as value
+late Map<DateTime, List<Task>> _selectedTasks;
+
+TextEditingController _taskController = TextEditingController();
+
+TimeOfDay _timeController = TimeOfDay(hour: 0, minute: 0);
+
+/// @author [MatthewSheldon]
+/// Used to update the [Event] object in the cloud
+void _updateEventObject() async {
+  _event.updateCalendarPage(calendarPage: _calendarPage);
+  _user.updateEvent(eventID: _event.getLink(), event: _event);
+  await UpdateFiles.updateEventFile(
+      documentID: _event.getLink(), json: _event.toJson());
+}
+
+/// @author [MatthewSheldon]
+/// Used to update the [_selectedTasks] for the current page
+void _buildSelectedTasksFromCalendarPage() {
+  _selectedTasks = <DateTime, List<Task>>{};
+  _calendarPage.getTasks().sort();
+  for (Task task in _calendarPage.getTasks()) {
+    DateTime currDate = task.getDueDate();
+    if (!_selectedTasks.containsKey(currDate)) {
+      _selectedTasks[currDate] = <Task>[];
+    }
+    _selectedTasks[currDate]!.add(task);
+  }
+}
+
 class Calendar extends StatefulWidget {
+  static late CalendarPage calendarPage;
+
+  Calendar({super.key, required User user, required Event event}) {
+    _user = user;
+    _event = event;
+    _calendarPage = _event.getCalendarPage();
+    _buildSelectedTasksFromCalendarPage();
+  }
+
   @override
   _CalendarState createState() => _CalendarState();
 }
 
 class _CalendarState extends State<Calendar> {
-  //map with date as key and list of tasks on that date as value
-  late Map<DateTime, List<Task>> selectedTasks;
   //calendar format is calendar view (month, two weeks, week)
   CalendarFormat format = CalendarFormat.month;
-  DateTime selectedDay = DateTime.parse((DateTime.now().toString()).substring(0, 10) + " 00:00:00.000Z");
-  DateTime focusedDay = DateTime.parse((DateTime.now().toString()).substring(0, 10) + " 00:00:00.000Z");
-
-  TextEditingController _taskController = TextEditingController();
-  TimeOfDay _timeController = TimeOfDay(hour: 0, minute: 0);
+  DateTime selectedDay = DateTime.parse(
+      (DateTime.now().toString()).substring(0, 10) + " 00:00:00.000Z");
+  DateTime focusedDay = DateTime.parse(
+      (DateTime.now().toString()).substring(0, 10) + " 00:00:00.000Z");
 
   @override
   void initState() {
-    selectedTasks = {}; //initializes selectedTasks to nothing
+    _buildSelectedTasksFromCalendarPage();
     super.initState();
   }
 
   List<Task> _getTasksfromDay(DateTime date) {
     String strManip = (date.toString()).substring(0, 10) + " 00:00:00.000Z";
-    return selectedTasks[DateTime.parse(strManip)] ?? [];
+    return _selectedTasks[DateTime.parse(strManip)] ?? <Task>[];
   }
 
   @override
@@ -51,7 +104,6 @@ class _CalendarState extends State<Calendar> {
 
   @override
   Widget build(BuildContext context) {
-    _timeController = TimeOfDay(hour: 0, minute: 0);
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -167,7 +219,7 @@ class _CalendarState extends State<Calendar> {
                     ),
                     //click on a new day, returns a list of tasks for that day
                     ..._getTasksfromDay(selectedDay).map(
-                          (Task event) => listTileWidget(event),
+                      (event) => listTileWidget(event),
                     ),
                     SizedBox(height: 80),
                   ],
@@ -179,7 +231,7 @@ class _CalendarState extends State<Calendar> {
       ),
       //button to add new task
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: (){
+        onPressed: () {
           showModalBottomSheet(
             isScrollControlled: true,
             context: context,
@@ -210,7 +262,7 @@ class _CalendarState extends State<Calendar> {
                                 Icons.close,
                               ),
                               color: Color.fromRGBO(186, 227, 101, 1),
-                              onPressed: (){
+                              onPressed: () {
                                 _taskController.clear();
                                 Navigator.pop(context);
                               },
@@ -233,22 +285,23 @@ class _CalendarState extends State<Calendar> {
                               ),
                               color: Color.fromRGBO(186, 227, 101, 1),
                               onPressed: () {
-                                if (_taskController.text.isEmpty || _timeController == null) {
+                                if (_taskController.text.isNotEmpty) {
+                                  /// @author [MatthewSheldon] moved all overhead to [CalendarPage] class
+                                  _calendarPage.addTask(
+                                      title: _taskController.text,
+                                      date: selectedDay,
+                                      time: _timeController);
+                                  _updateEventObject();
+                                  _buildSelectedTasksFromCalendarPage();
+                                  print(selectedDay.toString());
 
-                                } else {
-                                  if (selectedTasks[selectedDay] != null) {
-                                    selectedTasks[selectedDay]?.add(
-                                      Task(title: _taskController.text, day: selectedDay, time: _timeController),
-                                    );
-                                  } else {
-                                    selectedTasks[selectedDay] = [
-                                      Task(title: _taskController.text, day: selectedDay, time: _timeController),
-                                    ];
-                                  }
+                                  /// end @author [MatthewSheldon]
                                 }
                                 Navigator.pop(context);
                                 _taskController.clear();
-                                setState((){});
+                                _timeController =
+                                    const TimeOfDay(hour: 0, minute: 0);
+                                setState(() {});
                                 return;
                               },
                             ),
@@ -296,13 +349,17 @@ class _CalendarState extends State<Calendar> {
                               ),
                             ),
                             style: ButtonStyle(
-                              padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 20, vertical: 15)),
-                              shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                              padding: MaterialStateProperty.all(
+                                  EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 15)),
+                              shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20.0),
                               )),
-                              backgroundColor: MaterialStateProperty.all(Color(0xFFBAE365)),
+                              backgroundColor:
+                                  MaterialStateProperty.all(Color(0xFFBAE365)),
                             ),
-                            onPressed: () async{
+                            onPressed: () async {
                               _timeController = (await showTimePicker(
                                 context: context,
                                 initialTime: TimeOfDay.now(),
@@ -328,38 +385,59 @@ class _CalendarState extends State<Calendar> {
       ),
       //Navigation Bar with Icons
       bottomNavigationBar: BottomNavigationBar(
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        landscapeLayout: BottomNavigationBarLandscapeLayout.centered,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.home, color: Colors.black, size: 30), label: 'Home', backgroundColor: Color(0xFFA3B0EB)),
-          BottomNavigationBarItem(icon: Icon(Icons.calendar_month, color: Colors.black, size: 30), label: 'Calendar', backgroundColor: Color(0xFFA3B0EB)),
-          BottomNavigationBarItem(icon: Icon(Icons.wallet, color: Colors.black, size: 30), label: 'Budget', backgroundColor: Color(0xFFA3B0EB)),
-          BottomNavigationBarItem(icon: Icon(Icons.schedule, color: Colors.black, size: 30), label: 'Itinerary', backgroundColor: Color(0xFFA3B0EB)),
-          BottomNavigationBarItem(icon: Icon(Icons.person_add, color: Colors.black, size: 30), label: 'Collaborate', backgroundColor: Color(0xFFA3B0EB)),
-          BottomNavigationBarItem(icon: Icon(Icons.settings, color: Colors.black, size: 30), label: 'Settings', backgroundColor: Color(0xFFA3B0EB))
-        ]
-      ),
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
+          landscapeLayout: BottomNavigationBarLandscapeLayout.centered,
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+                icon: Icon(Icons.home, color: Colors.black, size: 30),
+                label: 'Home',
+                backgroundColor: Color(0xFFA3B0EB)),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.calendar_month, color: Colors.black, size: 30),
+                label: 'Calendar',
+                backgroundColor: Color(0xFFA3B0EB)),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.wallet, color: Colors.black, size: 30),
+                label: 'Budget',
+                backgroundColor: Color(0xFFA3B0EB)),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.schedule, color: Colors.black, size: 30),
+                label: 'Itinerary',
+                backgroundColor: Color(0xFFA3B0EB)),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.person_add, color: Colors.black, size: 30),
+                label: 'Collaborate',
+                backgroundColor: Color(0xFFA3B0EB)),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.settings, color: Colors.black, size: 30),
+                label: 'Settings',
+                backgroundColor: Color(0xFFA3B0EB))
+          ]),
     );
   }
 
-  Widget listTileWidget(Task event){
+  Widget listTileWidget(Task event) {
     return CheckboxListTile(
       activeColor: Color.fromRGBO(186, 227, 101, 1),
       checkColor: Colors.black,
       title: Text(
-        "${event.time.format(context)}".padRight(25) + "${event.title}",
+        "${event.getDueTime().format(context)}".padRight(25) +
+            "${event.getTaskName()}",
         style: GoogleFonts.lato(
-            decoration: event.isComplete
+            decoration: event.getIsComplete()
                 ? TextDecoration.lineThrough
-                : TextDecoration.none
-        ),
+                : TextDecoration.none),
       ),
-      value: event.isComplete,
-      onChanged: (value){
-        setState((){
-          event.isComplete = value!;
-        });
+      value: event.getIsComplete(),
+      onChanged: (value) {
+        /// @author [MatthewSheldon] moved overhead to [CalendarPage] class
+        _calendarPage.updateTask(event, value!);
+        _buildSelectedTasksFromCalendarPage();
+        _updateEventObject();
+
+        /// end @author [MatthewSheldon]
+        setState(() {});
       },
     );
   }

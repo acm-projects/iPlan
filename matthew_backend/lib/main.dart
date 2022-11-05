@@ -7,6 +7,7 @@ import 'Backend/Event_Manager/event.dart';
 import 'Backend/User_Creation/user.dart';
 import 'Backend/User_Creation/user_assembler.dart';
 
+import 'Frontend/Calendar/calendar.dart';
 import 'Frontend/Collaboration/collaboration.dart';
 import 'Frontend/Finance/budget.dart';
 import 'Frontend/Event_Manager/events_home_page.dart';
@@ -27,12 +28,16 @@ void main() async {
   }
 
   // ans = await EventCreator.createEvent(
-  //     eventName: "iPlan Victory Party",
+  //     eventName: "iPlan 3.0",
   //     budget: 24999.99,
   //     date: DateTime(2022, 12, 03),
   //     startTime: TimeOfDay(hour: 12, minute: 30),
   //     endTime: TimeOfDay(hour: 18, minute: 45),
   //     user: user);
+  //
+  // if(ans[0] == EventCreator.success) {
+  //   event = ans[1];
+  // }
 
   event = user.getEvents()[0];
   await event.getCollaborationPage().constructorHelperMethod();
@@ -56,7 +61,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: EventsHomePage(user: user),
+      home: Calendar(user: user, event: event),
     );
   }
 }

@@ -54,7 +54,7 @@ class Collaborator implements Comparable<Collaborator> {
   }
 
   /// Constructs a [Collaborator] object from the passed [json] file
-  Collaborator.fromJson(Map<String, dynamic> json) {
+  Collaborator.fromJson({required Map<String, dynamic> json}) {
     if (json["email"] == "null" && json["phoneNumber"] == "null") {
       throw NullParameterException();
     } else {

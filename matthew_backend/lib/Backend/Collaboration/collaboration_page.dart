@@ -57,7 +57,7 @@ class CollaborationPage {
     _date = json["date"];
     List<dynamic> collaboratorsData = json["collaborators"] as List<dynamic>;
     _collaborators = collaboratorsData
-        .map((collaborator) => Collaborator.fromJson(collaborator))
+        .map((collaborator) => Collaborator.fromJson(json: collaborator))
         .toList();
     _inviteLink = link;
   }

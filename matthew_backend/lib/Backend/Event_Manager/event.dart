@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../Calendar/calendar_page.dart';
 import '../Collaboration/collaboration_page.dart';
 import '../Finance/finance_page.dart';
 import '../User_Creation/user.dart';
@@ -27,7 +28,7 @@ class Event {
   late FinancePage _financePage;
 
   /// The [CalendarPage] object for this [Event] object
-  //late CalendarPage _calendarPage;
+  late CalendarPage _calendarPage;
 
   /// The [ItineraryPage] object for this [Event] object
   //late ItineraryPage _itineraryPage;
@@ -54,6 +55,7 @@ class Event {
     _financePage = FinancePage(totalBudget: budget);
     _collaborationPage = CollaborationPage(
         title: title, date: _convertDateTimeToString(), link: eventID);
+    _calendarPage = CalendarPage();
     _collaborationPage.addCollaboratorFromUser(user: user);
   }
 
@@ -66,7 +68,7 @@ class Event {
     _endTime = _getTimeFromString(json["endTime"]);
 
     _financePage = FinancePage.fromJson(json: json["financePage"]);
-    // _calendarPage = CalendarPage.fromJson(json: json["calendarPage"]);
+    _calendarPage = CalendarPage.fromJson(json: json["calendarPage"]);
     // _itineraryPage = ItineraryPage.fromJson(json: json["itineraryPage"]);
     _collaborationPage =
         CollaborationPage.fromJson(json: json["collaborationPage"], link: link);
@@ -130,9 +132,9 @@ class Event {
   }
 
   /// Returns this [Event] object's [CalendarPage] object
-  // CalendarPage getCalendarPage() {
-  //   return _calendarPage;
-  // }
+  CalendarPage getCalendarPage() {
+    return _calendarPage;
+  }
 
   /// Returns this [Event] object's [ItineraryPage] object
   // ItineraryPage getItineraryPage() {
@@ -142,22 +144,6 @@ class Event {
   /// Returns this [Event] object's [CollaborationPage] object
   CollaborationPage getCollaborationPage() {
     return _collaborationPage;
-  }
-
-  /// Converts the current [Event] object into a json file formatted [Map]
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      "eventName": _eventName,
-      "date": _date.toString(),
-      "startTime": "${_startTime.hour}:${_startTime.minute}",
-      "endTime": "${_endTime.hour}:${_endTime.minute}",
-      "financePage": _financePage.toJson(),
-      //"calendarPage": _calendarPage.toJson();
-      "calendarPage": {},
-      //"itineraryPage": _itineraryPage.toJson();
-      "itineraryPage": {},
-      "collaborationPage": _collaborationPage.toJson()
-    };
   }
 
   /// Updates the list of collaborators by replacing the place holder [Collaborator]
@@ -182,5 +168,26 @@ class Event {
   /// [financePage] updated [FinancePage] object.
   void updateFinancePage({required FinancePage financePage}) {
     _financePage = financePage;
+  }
+
+  /// Updates this object's instance of [_calendarPage] with the passed
+  /// [calendarPage] updated [CalendarPage] object.
+  void updateCalendarPage({required CalendarPage calendarPage}) {
+    _calendarPage = calendarPage;
+  }
+
+  /// Converts the current [Event] object into a json file formatted [Map]
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      "eventName": _eventName,
+      "date": _date.toString(),
+      "startTime": "${_startTime.hour}:${_startTime.minute}",
+      "endTime": "${_endTime.hour}:${_endTime.minute}",
+      "financePage": _financePage.toJson(),
+      "calendarPage": _calendarPage.toJson(),
+      //"itineraryPage": _itineraryPage.toJson(),
+      "itineraryPage": {},
+      "collaborationPage": _collaborationPage.toJson()
+    };
   }
 }
