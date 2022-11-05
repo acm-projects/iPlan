@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:matthew_backend/Backend/Event_Manager/event_creator.dart';
 
 import 'Backend/Authentication/log_in_authentication.dart';
+import 'Backend/Event_Manager/event_creator.dart';
 import 'Backend/Event_Manager/event.dart';
 import 'Backend/User_Creation/user.dart';
 import 'Backend/User_Creation/user_assembler.dart';
 
 import 'Frontend/Collaboration/collaboration.dart';
 import 'Frontend/Finance/budget.dart';
+import 'Frontend/Event_Manager/events_home_page.dart';
 
 late User user;
 
@@ -55,7 +56,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: Budget(user: user, event: event),
+      home: EventsHomePage(user: user),
     );
   }
 }

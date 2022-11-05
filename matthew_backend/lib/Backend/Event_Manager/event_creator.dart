@@ -126,11 +126,13 @@ class EventCreator {
     String oldUserID = "";
 
     // If the length of the link does not equal just the length of the event ID...
-    if (link.length != eventLinkLength) {
+    if (link.length > eventLinkLength) {
       // ...Then the user was directly invited, so additional overhead is needed
       oldUserID = link.substring(eventLinkLength);
       link = link.substring(0, eventLinkLength);
     }
+    print("event ID: $link");
+    print("old user ID: $oldUserID");
 
     // Attempt to retrieve the json file for the event
     var json;
@@ -148,7 +150,7 @@ class EventCreator {
     // Create the event object from the json file
     Event event = Event.fromJson(json: json, link: link);
     // If the user was directly invited...
-    if (link.length != eventLinkLength) {
+    if (oldUserID.isNotEmpty) {
       // Update the Collaborator object that temporarially was assigned to them
       event.updateCollaborator(oldUserID: oldUserID, user: user);
     } else {

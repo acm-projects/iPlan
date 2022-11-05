@@ -65,6 +65,7 @@ class _EventsHomeState extends State<EventsHomePage> {
 
   TextEditingController _eventNameTextEditor = TextEditingController();
   TextEditingController _eventBudgetTextEditor = TextEditingController();
+  TextEditingController _linkTextEditor = TextEditingController();
 
   Widget build(BuildContext context) {
     /// @author [MatthewSheldon]
@@ -215,7 +216,7 @@ class _EventsHomeState extends State<EventsHomePage> {
                                                   Padding(
                                                     padding:
                                                         const EdgeInsets.all(
-                                                            16.0),
+                                                            5.0),
                                                     child: TextField(
                                                         controller:
                                                             _eventNameTextEditor,
@@ -244,7 +245,7 @@ class _EventsHomeState extends State<EventsHomePage> {
                                                   Padding(
                                                     padding:
                                                         const EdgeInsets.all(
-                                                            16.0),
+                                                            5.0),
                                                     child: TextField(
                                                         controller:
                                                             _eventBudgetTextEditor,
@@ -274,7 +275,7 @@ class _EventsHomeState extends State<EventsHomePage> {
                                                   Padding(
                                                     padding:
                                                         const EdgeInsets.all(
-                                                            8.0),
+                                                            5.0),
                                                     child: Text(
                                                         "Pick Event Time",
                                                         style: GoogleFonts.lato(
@@ -285,7 +286,7 @@ class _EventsHomeState extends State<EventsHomePage> {
                                                   Padding(
                                                     padding:
                                                         const EdgeInsets.all(
-                                                            8.0),
+                                                            5.0),
                                                     child: EventTime(),
                                                   ),
 
@@ -293,7 +294,7 @@ class _EventsHomeState extends State<EventsHomePage> {
                                                   Padding(
                                                     padding:
                                                         const EdgeInsets.all(
-                                                            8.0),
+                                                            5.0),
                                                     child: Text(
                                                         "Pick Event Start Time",
                                                         style: GoogleFonts.lato(
@@ -304,14 +305,14 @@ class _EventsHomeState extends State<EventsHomePage> {
                                                   Padding(
                                                       padding:
                                                           const EdgeInsets.all(
-                                                              8.0),
+                                                              5.0),
                                                       child: EventStartTime()),
 
                                                   //END TIME BUTTON WITH PICKER
                                                   Padding(
                                                     padding:
                                                         const EdgeInsets.all(
-                                                            8.0),
+                                                            5.0),
                                                     child: Text(
                                                         "Pick Event End Time",
                                                         style: GoogleFonts.lato(
@@ -322,8 +323,59 @@ class _EventsHomeState extends State<EventsHomePage> {
                                                   Padding(
                                                       padding:
                                                           const EdgeInsets.all(
-                                                              8.0),
+                                                              5.0),
                                                       child: EventEndTime()),
+
+                                                  //CASI - added divider, Enter Collab Link text, and Text field
+                                                  Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              5.0),
+                                                      child: Divider(
+                                                          color: Colors.black)),
+
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            5.0),
+                                                    child: Text(
+                                                        "Or Enter Collab Link",
+                                                        style: GoogleFonts.lato(
+                                                            fontSize: 17,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold)),
+                                                  ),
+
+                                                  //Enter Link text field
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10.0),
+                                                    child: TextField(
+                                                        controller:
+                                                            _linkTextEditor,
+                                                        decoration:
+                                                            InputDecoration(
+                                                          hintText:
+                                                              "Enter Link",
+                                                          filled: true,
+                                                          fillColor:
+                                                              Color(0xFFECECEC),
+                                                          enabledBorder:
+                                                              OutlineInputBorder(
+                                                            borderSide:
+                                                                const BorderSide(
+                                                                    width: 3,
+                                                                    color: Color(
+                                                                        0xFFECECEC)),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20),
+                                                          ),
+                                                        )),
+                                                  ),
                                                   //This listTile contains the Close and Create buttons at the bottom of the popup
                                                   ListTile(
                                                       //Close button is leading
@@ -343,6 +395,12 @@ class _EventsHomeState extends State<EventsHomePage> {
                                                                         .circular(
                                                                             10.0))),
                                                         onPressed: () {
+                                                          _eventBudgetTextEditor
+                                                              .clear();
+                                                          _eventNameTextEditor
+                                                              .clear();
+                                                          _linkTextEditor
+                                                              .clear();
                                                           Navigator.pop(
                                                               context);
                                                         },
@@ -364,36 +422,67 @@ class _EventsHomeState extends State<EventsHomePage> {
                                                                           .circular(
                                                                               10.0))),
                                                           onPressed: () async {
-                                                            //Gets info from the text fields here
-                                                            var _eventName =
-                                                                _eventNameTextEditor
-                                                                    .text;
-                                                            var _eventBudget =
-                                                                _eventBudgetTextEditor
-                                                                    .text;
-
-                                                            // Attempt to create a new [Event] object from the passed information
-                                                            List<dynamic> ans =
-                                                                await EventCreator.createEvent(
-                                                                    eventName:
-                                                                        _eventName,
-                                                                    budget: double
-                                                                        .parse(
-                                                                            _eventBudget),
-                                                                    date: _date,
-                                                                    startTime:
-                                                                        _startTime,
-                                                                    endTime:
-                                                                        _endTime,
-                                                                    user:
-                                                                        _user);
-
-                                                            // If the operation was successful, then update the lists
-                                                            if (ans[0] ==
-                                                                EventCreator
-                                                                    .success) {
-                                                              updateLists();
+                                                            /// @author [MatthewSheldon]
+                                                            // If the user wanted to join via a link
+                                                            if (_linkTextEditor
+                                                                .text
+                                                                .isNotEmpty) {
+                                                              List<dynamic>
+                                                                  ans =
+                                                                  await EventCreator.joinEventFromLink(
+                                                                      user:
+                                                                          _user,
+                                                                      link: _linkTextEditor
+                                                                          .text);
+                                                              if (ans[0] ==
+                                                                  EventCreator
+                                                                      .success) {
+                                                                updateLists();
+                                                              }
                                                             }
+                                                            // If the user wanted to create a new event
+                                                            else if (_eventNameTextEditor
+                                                                    .text
+                                                                    .isNotEmpty &&
+                                                                _eventBudgetTextEditor
+                                                                    .text
+                                                                    .isNotEmpty) {
+                                                              //Gets info from the text fields here
+                                                              var _eventName =
+                                                                  _eventNameTextEditor
+                                                                      .text;
+                                                              var _eventBudget =
+                                                                  _eventBudgetTextEditor
+                                                                      .text;
+
+                                                              // Attempt to create a new [Event] object from the passed information
+                                                              List<dynamic> ans = await EventCreator.createEvent(
+                                                                  eventName:
+                                                                      _eventName,
+                                                                  budget: double
+                                                                      .parse(
+                                                                          _eventBudget),
+                                                                  date: _date,
+                                                                  startTime:
+                                                                      _startTime,
+                                                                  endTime:
+                                                                      _endTime,
+                                                                  user: _user);
+
+                                                              // If the operation was successful, then update the lists
+                                                              if (ans[0] ==
+                                                                  EventCreator
+                                                                      .success) {
+                                                                updateLists();
+                                                              }
+                                                            }
+                                                            _eventBudgetTextEditor
+                                                                .clear();
+                                                            _eventNameTextEditor
+                                                                .clear();
+                                                            _linkTextEditor
+                                                                .clear();
+                                                            /// end @author [MatthewSheldon]
                                                             //returns to the main page with Navigator.pop()
                                                             setState(() {});
                                                             Navigator.pop(
