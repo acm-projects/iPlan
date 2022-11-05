@@ -1,9 +1,11 @@
+import 'package:flutter/material.dart';
+
 import 'expense.dart';
 
 /// @author [MatthewSheldon]
 /// The [FinanceCategory] object represents an entire group of Expense objects
 /// with a common theme. This is used in tandem with the [FinancePage] class.
-class FinanceCategory implements Comparable<FinanceCategory> {
+class FinanceCategory {
   /// The name of the finance category
   late String _categoryName;
 
@@ -16,14 +18,21 @@ class FinanceCategory implements Comparable<FinanceCategory> {
   /// The total allocated budget for the category
   late double _totalBudget;
 
+  /// The color of the category
+  late Color _color;
+
   /// The list of the individual expenses for the category
   late List<Expense> _listOfExpenses;
 
-  /// Creates a [FinanceCategory] Object with parameters [name] and [budget]
-  FinanceCategory({required String name, required double budget}) {
+  /// Creates a [FinanceCategory] Object with parameters [name], [budget] and [color]
+  FinanceCategory(
+      {required String name, required double budget, required Color color}) {
     _categoryName = name;
     _totalBudget = budget;
     _budgetRemaining = budget;
+    _budgetUsed = 0;
+    _color = color;
+    _listOfExpenses = <Expense>[];
   }
 
   /// Constructs a [FinanceCategory] object from the passed [json] file
@@ -32,15 +41,17 @@ class FinanceCategory implements Comparable<FinanceCategory> {
     _budgetRemaining = json["budgetRemaining"];
     _budgetUsed = json["budgetUsed"];
     _totalBudget = json["totalBudget"];
+    _color = Color(int.parse(json["color"], radix: 16));
     List<dynamic> expensesData = json["expenses"] as List<dynamic>;
     _listOfExpenses =
         expensesData.map((expense) => Expense.fromJson(json: expense)).toList();
   }
 
   /// Inserts the passed [newExpense] item into the [_listOfExpenses] in order
-  /// with respect to alphabetic order. Additionally, update the [_budgetUsed] 
+  /// with respect to alphabetic order. Additionally, update the [_budgetUsed]
   /// and [_budgetRemaining]
   void addItem({required Expense newExpense}) {
+    // Iterate through the list and find the place to insert it.
     for (int i = 0; i < _listOfExpenses.length; i++) {
       if (_listOfExpenses[i]
               .getExpenseName()
@@ -52,12 +63,15 @@ class FinanceCategory implements Comparable<FinanceCategory> {
         return;
       }
     }
+    // Otherwise, add it at the end
     _listOfExpenses.add(newExpense);
+    _budgetUsed += newExpense.getExpenseBudget();
+    _budgetRemaining = _totalBudget - _budgetUsed;
   }
 
-  /// Removes the [Expense] object described by the passed [expenseName] from 
-  /// this [FinanceCategory]'s [_listOfExpenses]. Additionally, update the 
-  /// [_budgetUsed] and [_budgetRemaining]. 
+  /// Removes the [Expense] object described by the passed [expenseName] from
+  /// this [FinanceCategory]'s [_listOfExpenses]. Additionally, update the
+  /// [_budgetUsed] and [_budgetRemaining].
   void removeItem({required String expenseName}) {
     for (int i = 0; i < _listOfExpenses.length; i++) {
       if (_listOfExpenses[i].getExpenseName() == expenseName) {
@@ -89,9 +103,31 @@ class FinanceCategory implements Comparable<FinanceCategory> {
     return _totalBudget;
   }
 
+  /// Returns the color of this [FinanceCategory]
+  Color getColor() {
+    return _color;
+  }
+
   /// Returns this [FinanceCategory] object's list of [Expense] objects
   List<Expense> getListOfExpenses() {
     return _listOfExpenses;
+  }
+
+  /// Updates the [_categoryName] of this object to be the passed [newCategoryName]
+  void updateCategoryName({required String newCategoryName}) {
+    _categoryName = newCategoryName;
+  }
+
+  /// Updates the [_totalBudget] to be the passed [newBudget] and updates
+  /// the [_budgetRemaining] to be the differece of [newBudget] and [_budgetUsed]
+  void updateBudget({required double newBudget}) {
+    _totalBudget = newBudget;
+    _budgetRemaining = _totalBudget - _budgetUsed;
+  }
+
+  /// Updates the [_color] of this object to be the passed [newColor]
+  void updateColor({required Color newColor}) {
+    _color = newColor;
   }
 
   /// Converts the current [FinanceCategory] object into a json file formatted [Map]
@@ -101,12 +137,8 @@ class FinanceCategory implements Comparable<FinanceCategory> {
       "budgetRemaining": _budgetRemaining,
       "budgetUsed": _budgetUsed,
       "totalBudget": _totalBudget,
+      "color": _color.toString().substring(8, 16),
       "expenses": _listOfExpenses.map((expense) => expense.toJson()).toList()
     };
-  }
-
-  @override
-  int compareTo(FinanceCategory other) {
-    return _categoryName.compareTo(other.getCategoryName());
   }
 }

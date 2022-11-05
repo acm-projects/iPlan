@@ -24,7 +24,12 @@ class FinancePage {
     _totalBudget = totalBudget;
     _budgetRemaining = totalBudget;
     _budgetSpent = 0;
-    _listOfCategories = <FinanceCategory>[];
+    _listOfCategories = [
+      FinanceCategory(
+          name: "Discretionary",
+          budget: totalBudget,
+          color: const Color(0xFFE7E7E7))
+    ];
   }
 
   /// Constructs a [FinancePage] object from the passed [json] file
@@ -48,16 +53,16 @@ class FinancePage {
 
   /// Adds a new [FinanceCategory] to [_listOfCategories] described by the
   /// passed [categoryName] and [budget].
-  void addCategory({required String categoryName, required double budget}) {
+  void addCategory(
+      {required String categoryName,
+      required double budget,
+      required Color color}) {
     FinanceCategory newCategory =
-        FinanceCategory(name: categoryName, budget: budget);
-    for (int i = 0; i < _listOfCategories.length; i++) {
-      if (newCategory.compareTo(_listOfCategories[i]) < 0) {
-        _listOfCategories.insert(i, newCategory);
-        return;
-      }
-    }
-    _listOfCategories.add(newCategory);
+        FinanceCategory(name: categoryName, budget: budget, color: color);
+    _listOfCategories.insert(_listOfCategories.length - 1,
+        newCategory); // Add the category at the end of the list, but before discretionary
+    _budgetSpent += budget;
+    _budgetRemaining = _totalBudget - _budgetSpent;
   }
 
   /// Removes a [FinanceCategory] from [_listOfCategories] described by the
@@ -67,13 +72,14 @@ class FinancePage {
       if (_listOfCategories[i].getCategoryName() == categoryName) {
         FinanceCategory removedCategory = _listOfCategories.removeAt(i);
         _budgetSpent -= removedCategory.getTotalBudget();
+        _budgetRemaining = _totalBudget - _budgetSpent;
         return;
       }
     }
   }
 
-  /// Adds an [Expense] object described by the [expenseName] and 
-  /// [expenseBudget] to a [FinanceCategory] described by [categoryName] 
+  /// Adds an [Expense] object described by the [expenseName] and
+  /// [expenseBudget] to a [FinanceCategory] described by [categoryName]
   /// contained within [_listOfCategories].
   void addExpenseToCategory(
       {required String categoryName,
@@ -88,7 +94,7 @@ class FinancePage {
     }
   }
 
-  /// Removes an [Expense] object described by [expenseName] from a 
+  /// Removes an [Expense] object described by [expenseName] from a
   /// [FinanceCategory] object described by [categoryName] contained within
   /// [_listOfCategories].
   void removeExpenseFromCategory(
@@ -99,6 +105,42 @@ class FinancePage {
         return;
       }
     }
+  }
+
+  /// Updates the budget of a [FinanceCategory] described by [categoryName] to
+  /// be the value of the passed [newBudget].
+  void updateBudgetForCategory(
+      {required String categoryName, required double newBudget}) {
+    for (int i = 0; i < _listOfCategories.length - 1; i++) {
+      if (_listOfCategories[i].getCategoryName() == categoryName) {
+        double difference = newBudget - _listOfCategories[i].getTotalBudget();
+        _listOfCategories[i].updateBudget(newBudget: newBudget);
+        _budgetSpent += difference;
+        _budgetRemaining = _totalBudget - _budgetSpent;
+        return;
+      }
+    }
+  }
+
+  /// Updates the name of a [FinanceCategory] described by [oldName] to be the
+  /// value of the passed [newName].
+  void updateCategoryName({required String oldName, required String newName}) {
+    for (int i = 0; i < _listOfCategories.length - 1; i++) {
+      if (_listOfCategories[i].getCategoryName() == oldName) {
+        _listOfCategories[i].updateCategoryName(newCategoryName: newName);
+        return;
+      }
+    }
+  }
+
+  /// Updates the budget variables for the `"Discretionary"` [FinanceCategory]
+  /// object contained within [_listOfCategories]. Update the [_budgetRemaining]
+  /// of the current [FinancePage] object to be equal to [newBudget]. Lastly,
+  /// update the [_totalBudget] of the [FinanceCategory] to be the passed [newBudget].
+  void updateBudgetForDiscretionary({required double newBudget}) {
+    _budgetRemaining = newBudget;
+    _listOfCategories[_listOfCategories.length - 1]
+        .updateBudget(newBudget: newBudget);
   }
 
   /// Returns the total budget

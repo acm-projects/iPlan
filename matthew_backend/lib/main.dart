@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:matthew_backend/Backend/Event_Manager/event_creator.dart';
 
 import 'Backend/Authentication/log_in_authentication.dart';
 import 'Backend/Event_Manager/event.dart';
@@ -7,6 +8,7 @@ import 'Backend/User_Creation/user.dart';
 import 'Backend/User_Creation/user_assembler.dart';
 
 import 'Frontend/Collaboration/collaboration.dart';
+import 'Frontend/Finance/budget.dart';
 
 late User user;
 
@@ -23,19 +25,16 @@ void main() async {
     user = ans[1];
   }
 
-  print(ans[0]);
-
   // ans = await EventCreator.createEvent(
-  //     eventName: "iPlan test 2.0",
-  //     budget: 15999.99,
-  //     date: DateTime(2022, 11, 5),
-  //     startTime: TimeOfDay(hour: 7, minute: 30),
-  //     endTime: TimeOfDay(hour: 15, minute: 45),
+  //     eventName: "iPlan Victory Party",
+  //     budget: 24999.99,
+  //     date: DateTime(2022, 12, 03),
+  //     startTime: TimeOfDay(hour: 12, minute: 30),
+  //     endTime: TimeOfDay(hour: 18, minute: 45),
   //     user: user);
 
   event = user.getEvents()[0];
   await event.getCollaborationPage().constructorHelperMethod();
-  print(event.toJson());
 
   runApp(MyApp());
 }
@@ -56,7 +55,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: Collaboration(user: user, event: event),
+      home: Budget(user: user, event: event),
     );
   }
 }

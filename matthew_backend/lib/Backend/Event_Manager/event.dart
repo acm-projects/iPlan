@@ -177,4 +177,10 @@ class Event {
   void updateCollaborationPage({required CollaborationPage collaborationPage}) {
     _collaborationPage = collaborationPage;
   }
+
+  /// Updates this object's instance of [_financePage] with the passed
+  /// [financePage] updated [FinancePage] object.
+  void updateFinancePage({required FinancePage financePage}) {
+    _financePage = financePage;
+  }
 }

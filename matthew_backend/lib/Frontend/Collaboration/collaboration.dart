@@ -29,6 +29,7 @@ late List<String> _contacts;
 /// The contact that was selected
 String _selectedContact = "";
 
+/// @author [MatthewSheldon]
 /// Used to update the [Event] object in the cloud
 void _updateEventObject() async {
   _event.updateCollaborationPage(collaborationPage: _collaborationPage);

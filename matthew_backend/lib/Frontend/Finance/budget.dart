@@ -1,63 +1,110 @@
-/*
-  TODO: getBudgetList() to initialize the _budgetList (right now, the initial budgetList only includes discretionary budget)
-  Line 298: where category is created
-  Line 456: where category is deleted
-  Line 777: where expense is added
-  Line 924: where category is edited
- */
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
-
 import 'package:syncfusion_flutter_charts/charts.dart';
 
+import '../../Backend/Authentication/update_files.dart';
+import '../../Backend/User_Creation/user.dart';
+import '../../Backend/Event_Manager/event.dart';
+import '../../Backend/Finance/expense.dart';
+import '../../Backend/Finance/finance_category.dart';
+import '../../Backend/Finance/finance_page.dart';
+
+/// @author [MatthewSheldon]
+/// The [User] object that will be updated
+late User _user;
+
+/// @author [MatthewSheldon]
+/// The [Event] object for the current event that will be updated
+late Event _event;
+
+/// @author [MatthewSheldon]
+/// The [FinancePage] object for the current [Event] object that will be updated
+late FinancePage _financePage;
+
+/// @author [MatthewSheldon]
+/// The list of [FinanceCategory] objects for the current [Event] object
+late List<FinanceCategory> _budgetList;
+
+/// @author [JenniferZhang]
+/// The total budget of the current event
+late double _totalBudget;
+
+/// @author [JenniferZhang]
+/// The amount of the total budget that has been spent
+late double _budgetSpent;
+
+/// @author [MatthewSheldon]
+/// The amount of the total budget that has not been allocated
+late double _budgetRemaining;
+
+/// @author [JenniferZhang]
+/// The percent of the budget that has been used
+late double _percent;
+
+/// @author [MatthewSheldon]
+/// Used to update the [Event] object in the cloud
+void _updateEventObject() async {
+  _event.updateFinancePage(financePage: _financePage);
+  _user.updateEvent(eventID: _event.getLink(), event: _event);
+  await UpdateFiles.updateEventFile(
+      documentID: _event.getLink(), json: _event.toJson());
+}
+
+/// @author [JenniferZhang]
+void _updateBudgetVals() {
+  /// @author [MatthewSheldon] updated the variables used to be the Backend
+  /// equivalent of what [JenniferZhang] had been using
+  _totalBudget = _financePage.getTotalBudget();
+  _budgetSpent = _financePage.getBudgetSpent();
+  _budgetRemaining = _financePage.getBudgetRemaining();
+  _financePage.updateBudgetForDiscretionary(newBudget: _budgetRemaining);
+  _percent = (_budgetSpent / _totalBudget) * 100;
+  _budgetList = _financePage.getFinanceCategories();
+}
+
 class Budget extends StatefulWidget {
+  /// @author [MatthewSheldon]
+  /// Constructs a [Budget] page with the [User] object and [Event] object
+  /// defined by the passed [user] and [event] paramaters
+  Budget({super.key, required User user, required Event event}) {
+    _user = user;
+    _event = event;
+    _financePage = _event.getFinancePage();
+    _updateBudgetVals();
+  }
+
   @override
   _BudgetState createState() => _BudgetState();
 }
 
 class _BudgetState extends State<Budget> {
-  List<Color> colors = [Color(0xFF8E65E3), Color(0xFFE38E65), Color(0xFF65E38E), Color(0xFF65BAE3), Color(0xFFE3CD65), Color(0xFFE3657B), Color(0xFF65E3CD), Color(0xFFFFA500)];
+  List<Color> colors = [
+    Color(0xFF8E65E3),
+    Color(0xFFE38E65),
+    Color(0xFF65E38E),
+    Color(0xFF65BAE3),
+    Color(0xFFE3CD65),
+    Color(0xFFE3657B),
+    Color(0xFF65E3CD),
+    Color(0xFFFFA500)
+  ];
   int colorsIndex = 0;
 
-  late List<BudgetData> _budgetList;
   late TooltipBehavior _tooltipBehavior;
   var f = NumberFormat("\$###,##0.00");
-  double budget = 12000;
-  late double spent;
-  late double percent;
 
   TextEditingController _expenseController = TextEditingController();
   TextEditingController _amountController = TextEditingController();
   TextEditingController _categoryController = TextEditingController();
   TextEditingController _categoryBudgetController = TextEditingController();
 
-
   @override
-  void initState(){
+  void initState() {
     _tooltipBehavior = TooltipBehavior(enable: true);
-    _budgetList = getBudgetList();
-    updateBudgetVals();
+    _updateBudgetVals();
     super.initState();
-  }
-
-  void updateBudgetVals(){
-    spent = 0;
-    for (var i = 0; i < _budgetList.length - 1; i++) {
-      spent += _budgetList[i].budget;
-    }
-    _budgetList[_budgetList.length - 1].budget = budget - spent;
-    percent = spent / budget * 100;
-  }
-
-  void updateExpenseVals(BudgetData category){
-    double tempSpent = 0;
-    for (var i = 0; i < category.expenses.length; i++) {
-      tempSpent += category.expenses[i].amount;
-    }
-    category.moneySpent = tempSpent;
   }
 
   @override
@@ -98,7 +145,7 @@ class _BudgetState extends State<Budget> {
                   ),
                 ),
                 child: ListView(
-                  children:[
+                  children: [
                     SizedBox(height: 25),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -114,7 +161,7 @@ class _BudgetState extends State<Budget> {
                           ),
                         ),
                         Text(
-                          f.format(budget - spent),
+                          f.format(_budgetRemaining),
                           style: GoogleFonts.lato(
                             textStyle: TextStyle(
                               color: Colors.black,
@@ -127,95 +174,94 @@ class _BudgetState extends State<Budget> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Column(
-                              children: [
-                                Text(
-                                  'Total Budget',
-                                  style: GoogleFonts.lato(
-                                    textStyle: TextStyle(
-                                      color: Colors.black38,
-                                      fontSize: 15.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                            Column(children: [
+                              Text(
+                                'Total Budget',
+                                style: GoogleFonts.lato(
+                                  textStyle: TextStyle(
+                                    color: Colors.black38,
+                                    fontSize: 15.0,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                Text(
-                                  f.format(budget),
-                                  style: GoogleFonts.lato(
-                                    textStyle: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 30.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                              ),
+                              Text(
+                                f.format(_totalBudget),
+                                style: GoogleFonts.lato(
+                                  textStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 30.0,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              ]
-                            ),
+                              ),
+                            ]),
                             SizedBox(width: 30),
-                            Column(
-                              children: [
-                                Text(
-                                  'Spent Budget',
-                                  style: GoogleFonts.lato(
-                                    textStyle: TextStyle(
-                                      color: Colors.black38,
-                                      fontSize: 15.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                            Column(children: [
+                              Text(
+                                'Spent Budget',
+                                style: GoogleFonts.lato(
+                                  textStyle: TextStyle(
+                                    color: Colors.black38,
+                                    fontSize: 15.0,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                Text(
-                                  f.format(spent),
-                                  style: GoogleFonts.lato(
-                                    textStyle: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 30.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                              ),
+                              Text(
+                                f.format(_budgetSpent),
+                                style: GoogleFonts.lato(
+                                  textStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 30.0,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              ]
-                            ),
+                              ),
+                            ]),
                           ],
                         ),
                         SizedBox(height: 40),
                         SfCircularChart(
-                          annotations: <CircularChartAnnotation>[
-                            CircularChartAnnotation(
-                              widget: Container(
-                                child: Text(
-                                  percent.toStringAsFixed(2) + '%',
-                                  style: GoogleFonts.lato(
-                                    textStyle: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 30.0,
-                                      fontWeight: FontWeight.bold,
+                            annotations: <CircularChartAnnotation>[
+                              CircularChartAnnotation(
+                                widget: Container(
+                                  child: Text(
+                                    _percent.toStringAsFixed(2) + '%',
+                                    style: GoogleFonts.lato(
+                                      textStyle: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 30.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
-                          tooltipBehavior: _tooltipBehavior,
-                          series: <CircularSeries>[
-                            DoughnutSeries<BudgetData, String>(
-                              dataSource: _budgetList,
-                              pointColorMapper: (BudgetData data,_) => data.color,
-                              xValueMapper: (BudgetData data,_) => data.category,
-                              yValueMapper: (BudgetData data,_) => data.budget,
-                              innerRadius: '70%',
-                              radius: '90%',
-                              sortingOrder: SortingOrder.none,
-                              explode: true,
-                              dataLabelMapper: (BudgetData data,_) => data.category,
-                              dataLabelSettings: DataLabelSettings(
-                                  isVisible: true,
-                                  labelPosition: ChartDataLabelPosition.outside
-                              ),
-                              enableTooltip: true,
-                            )
-                          ]
-                        ),
+                            ],
+                            tooltipBehavior: _tooltipBehavior,
+                            series: <CircularSeries>[
+                              DoughnutSeries<FinanceCategory, String>(
+                                dataSource: _budgetList,
+                                pointColorMapper: (FinanceCategory data, _) =>
+                                    data.getColor(),
+                                xValueMapper: (FinanceCategory data, _) =>
+                                    data.getCategoryName(),
+                                yValueMapper: (FinanceCategory data, _) =>
+                                    data.getTotalBudget(),
+                                innerRadius: '70%',
+                                radius: '90%',
+                                sortingOrder: SortingOrder.none,
+                                explode: true,
+                                dataLabelMapper: (FinanceCategory data, _) =>
+                                    data.getCategoryName(),
+                                dataLabelSettings: DataLabelSettings(
+                                    isVisible: true,
+                                    labelPosition:
+                                        ChartDataLabelPosition.outside),
+                                enableTooltip: true,
+                              )
+                            ]),
                       ],
                     ),
                     SizedBox(height: 20),
@@ -232,24 +278,24 @@ class _BudgetState extends State<Budget> {
                       ),
                     ),
                     SizedBox(height: 10),
-                    for(var i = 0; i < _budgetList.length - 1; i++)(
-                      Column(
+                    for (var i = 0; i < _budgetList.length - 1; i++)
+                      (Column(
                         children: [
                           budgetCategory(_budgetList[i]),
                         ],
-                      )
-                    ),
+                      )),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 0.0),
                       child: FloatingActionButton.extended(
-                        onPressed: (){
+                        onPressed: () {
                           showModalBottomSheet(
                             isScrollControlled: true,
                             context: context,
                             builder: (context) => SingleChildScrollView(
                               child: Container(
                                 padding: EdgeInsets.only(
-                                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                                  bottom:
+                                      MediaQuery.of(context).viewInsets.bottom,
                                 ),
                                 child: Container(
                                   color: Color(0xff757575),
@@ -265,17 +311,20 @@ class _BudgetState extends State<Budget> {
                                     child: Column(
                                       children: <Widget>[
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
                                           children: [
                                             IconButton(
                                               icon: const Icon(
                                                 size: 40.0,
                                                 Icons.close,
                                               ),
-                                              color: Color.fromRGBO(186, 227, 101, 1),
-                                              onPressed: (){
+                                              color: Color.fromRGBO(
+                                                  186, 227, 101, 1),
+                                              onPressed: () {
                                                 _categoryController.clear();
-                                                _categoryBudgetController.clear();
+                                                _categoryBudgetController
+                                                    .clear();
                                                 Navigator.pop(context);
                                               },
                                             ),
@@ -286,7 +335,8 @@ class _BudgetState extends State<Budget> {
                                               style: GoogleFonts.lato(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 30.0,
-                                                color: Color.fromRGBO(254, 247, 236, 1),
+                                                color: Color.fromRGBO(
+                                                    254, 247, 236, 1),
                                               ),
                                             ),
                                             SizedBox(height: 10),
@@ -295,25 +345,45 @@ class _BudgetState extends State<Budget> {
                                                 size: 40.0,
                                                 Icons.check_circle,
                                               ),
-                                              color: Color.fromRGBO(186, 227, 101, 1),
+                                              color: Color.fromRGBO(
+                                                  186, 227, 101, 1),
                                               onPressed: () {
-                                                //TODO: where category is created
-                                                if (isAmountValid(_categoryBudgetController)){
-                                                  if (!(_categoryController.text.isEmpty || _categoryBudgetController.text.isEmpty)) {
-                                                    _budgetList.insert(_budgetList.length - 1, new BudgetData(_categoryController.text, double.parse(_categoryBudgetController.text), colors[colorsIndex]));
+                                                if (isAmountValid(
+                                                    _categoryBudgetController)) {
+                                                  if (!(_categoryController
+                                                          .text.isEmpty ||
+                                                      _categoryBudgetController
+                                                          .text.isEmpty)) {
+                                                    /// @author [MatthewSheldon] changed from updating the
+                                                    _financePage.addCategory(
+                                                        categoryName:
+                                                            _categoryController
+                                                                .text,
+                                                        budget: double.parse(
+                                                            _categoryBudgetController
+                                                                .text),
+                                                        color: colors[
+                                                            colorsIndex]);
+
+                                                    /// end @author [MatthewSheldon]
                                                   }
-                                                  if (colorsIndex < 7){
+                                                  if (colorsIndex < 7) {
                                                     colorsIndex++;
-                                                  }
-                                                  else{
+                                                  } else {
                                                     colorsIndex = 0;
                                                   }
-                                                  updateBudgetVals();
+
+                                                  /// @author [MatthewSheldon]
+                                                  _updateBudgetVals();
+                                                  _updateEventObject();
+
+                                                  /// end @author [MatthewSheldon]
                                                   Navigator.pop(context);
                                                   _categoryController.clear();
                                                 }
-                                                _categoryBudgetController.clear();
-                                                setState((){});
+                                                _categoryBudgetController
+                                                    .clear();
+                                                setState(() {});
                                                 return;
                                               },
                                             ),
@@ -323,14 +393,18 @@ class _BudgetState extends State<Budget> {
                                         //category name
                                         Container(
                                           decoration: BoxDecoration(
-                                            color: Color.fromRGBO(254, 247, 236, 1),
-                                            borderRadius: BorderRadius.circular(20),
+                                            color: Color.fromRGBO(
+                                                254, 247, 236, 1),
+                                            borderRadius:
+                                                BorderRadius.circular(20),
                                           ),
                                           child: Padding(
-                                            padding: const EdgeInsets.only(left: 10.0),
+                                            padding: const EdgeInsets.only(
+                                                left: 10.0),
                                             child: TextField(
                                               inputFormatters: [
-                                                LengthLimitingTextInputFormatter(20),
+                                                LengthLimitingTextInputFormatter(
+                                                    20),
                                               ],
                                               controller: _categoryController,
                                               style: GoogleFonts.lato(
@@ -352,16 +426,21 @@ class _BudgetState extends State<Budget> {
                                         //budget amount
                                         Container(
                                           decoration: BoxDecoration(
-                                            color: Color.fromRGBO(254, 247, 236, 1),
-                                            borderRadius: BorderRadius.circular(20),
+                                            color: Color.fromRGBO(
+                                                254, 247, 236, 1),
+                                            borderRadius:
+                                                BorderRadius.circular(20),
                                           ),
                                           child: Padding(
-                                            padding: const EdgeInsets.only(left: 10.0),
+                                            padding: const EdgeInsets.only(
+                                                left: 10.0),
                                             child: TextField(
                                               inputFormatters: [
-                                                LengthLimitingTextInputFormatter(20),
+                                                LengthLimitingTextInputFormatter(
+                                                    20),
                                               ],
-                                              controller: _categoryBudgetController,
+                                              controller:
+                                                  _categoryBudgetController,
                                               style: GoogleFonts.lato(
                                                 color: Colors.black,
                                               ),
@@ -401,14 +480,16 @@ class _BudgetState extends State<Budget> {
                       Padding(
                         padding: const EdgeInsets.all(15.0),
                         child: FloatingActionButton.extended(
-                          onPressed: (){
+                          onPressed: () {
                             showModalBottomSheet(
                               isScrollControlled: true,
                               context: context,
                               builder: (context) => SingleChildScrollView(
                                 child: Container(
                                   padding: EdgeInsets.only(
-                                    bottom: MediaQuery.of(context).viewInsets.bottom,
+                                    bottom: MediaQuery.of(context)
+                                        .viewInsets
+                                        .bottom,
                                   ),
                                   child: Container(
                                     color: Color(0xff757575),
@@ -424,15 +505,17 @@ class _BudgetState extends State<Budget> {
                                       child: Column(
                                         children: <Widget>[
                                           Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
                                             children: [
                                               IconButton(
                                                 icon: const Icon(
                                                   size: 40.0,
                                                   Icons.close,
                                                 ),
-                                                color: Color.fromRGBO(186, 227, 101, 1),
-                                                onPressed: (){
+                                                color: Color.fromRGBO(
+                                                    186, 227, 101, 1),
+                                                onPressed: () {
                                                   _categoryController.clear();
                                                   Navigator.pop(context);
                                                 },
@@ -444,7 +527,8 @@ class _BudgetState extends State<Budget> {
                                                 style: GoogleFonts.lato(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 30.0,
-                                                  color: Color.fromRGBO(254, 247, 236, 1),
+                                                  color: Color.fromRGBO(
+                                                      254, 247, 236, 1),
                                                 ),
                                               ),
                                               SizedBox(height: 10),
@@ -453,16 +537,23 @@ class _BudgetState extends State<Budget> {
                                                   size: 40.0,
                                                   Icons.check_circle,
                                                 ),
-                                                color: Color.fromRGBO(186, 227, 101, 1),
+                                                color: Color.fromRGBO(
+                                                    186, 227, 101, 1),
                                                 onPressed: () {
-                                                  //TODO: deletes category
-                                                  if (isCategoryValid(_categoryController)){
-                                                    _budgetList.remove(getCategory(_categoryController));
-                                                    updateBudgetVals();
+                                                  if (isCategoryValid(
+                                                      _categoryController)) {
+                                                    /// @author [MatthewSheldon]
+                                                    _financePage.removeCategory(
+                                                        categoryName:
+                                                            _categoryController
+                                                                .text);
+                                                    _updateBudgetVals();
+                                                    _updateEventObject();
+                                                    /// end @author [MatthewSheldon]
                                                     Navigator.pop(context);
                                                   }
                                                   _categoryController.clear();
-                                                  setState((){});
+                                                  setState(() {});
                                                   return;
                                                 },
                                               ),
@@ -472,14 +563,18 @@ class _BudgetState extends State<Budget> {
                                           //expense name
                                           Container(
                                             decoration: BoxDecoration(
-                                              color: Color.fromRGBO(254, 247, 236, 1),
-                                              borderRadius: BorderRadius.circular(20),
+                                              color: Color.fromRGBO(
+                                                  254, 247, 236, 1),
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
                                             ),
                                             child: Padding(
-                                              padding: const EdgeInsets.only(left: 10.0),
+                                              padding: const EdgeInsets.only(
+                                                  left: 10.0),
                                               child: TextField(
                                                 inputFormatters: [
-                                                  LengthLimitingTextInputFormatter(20),
+                                                  LengthLimitingTextInputFormatter(
+                                                      20),
                                                 ],
                                                 controller: _categoryController,
                                                 style: GoogleFonts.lato(
@@ -527,21 +622,15 @@ class _BudgetState extends State<Budget> {
     );
   }
 
-  List<BudgetData> getBudgetList(){
-    List<BudgetData> chartData = [
-      BudgetData('Discretionary', 0, Color(0xFFE7E7E7))
-    ];
-    return chartData;
-  }
-
-  Widget budgetCategory(BudgetData category){
+  Widget budgetCategory(FinanceCategory category) {
+    List<Expense> expenses = category.getListOfExpenses();
     return Padding(
       padding: const EdgeInsets.all(15.0),
       child: Container(
         decoration: BoxDecoration(
           shape: BoxShape.rectangle,
           border: Border.all(
-            color: category.color,
+            color: category.getColor(),
             width: 5.0,
           ),
           borderRadius: BorderRadius.all(
@@ -558,14 +647,14 @@ class _BudgetState extends State<Budget> {
                   width: 100,
                   margin: EdgeInsets.fromLTRB(0.0, 0.0, 30.0, 0.0),
                   decoration: BoxDecoration(
-                    color: category.color,
+                    color: category.getColor(),
                     shape: BoxShape.circle,
                   ),
                   child: Column(
-                    children:[
+                    children: [
                       SizedBox(height: 10),
                       Text(
-                        category.expenses.length.toString(),
+                        expenses.length.toString(),
                         style: GoogleFonts.lato(
                           textStyle: TextStyle(
                             color: Color.fromRGBO(254, 247, 236, 1),
@@ -587,9 +676,9 @@ class _BudgetState extends State<Budget> {
                   ),
                 ),
                 Column(
-                  children:[
+                  children: [
                     Text(
-                      category.category,
+                      category.getCategoryName(),
                       style: GoogleFonts.lato(
                         textStyle: TextStyle(
                           color: Colors.black,
@@ -600,10 +689,10 @@ class _BudgetState extends State<Budget> {
                     ),
                     SizedBox(height: 15),
                     Row(
-                      children:[
+                      children: [
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children:[
+                          children: [
                             Text(
                               'Remaining Budget',
                               style: GoogleFonts.lato(
@@ -638,19 +727,21 @@ class _BudgetState extends State<Budget> {
                         SizedBox(width: 40),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children:[
+                          children: [
                             Text(
-                              f.format(category.budget - category.moneySpent),
+                              f.format(category.getBudgetRemaining()),
                               style: GoogleFonts.lato(
                                 textStyle: TextStyle(
-                                  color: ((category.budget - category.moneySpent) > 0) ? Colors.black : Colors.red,
+                                  color: ((category.getBudgetRemaining()) > 0)
+                                      ? Colors.black
+                                      : Colors.red,
                                   fontSize: 14.0,
                                 ),
                               ),
                             ),
                             SizedBox(height: 10),
                             Text(
-                              f.format(category.budget),
+                              f.format(category.getTotalBudget()),
                               style: GoogleFonts.lato(
                                 textStyle: TextStyle(
                                   color: Colors.black,
@@ -660,7 +751,7 @@ class _BudgetState extends State<Budget> {
                             ),
                             SizedBox(height: 10),
                             Text(
-                              f.format(category.moneySpent),
+                              f.format(category.getBudgetUsedOnCategory()),
                               style: GoogleFonts.lato(
                                 textStyle: TextStyle(
                                   color: Colors.black,
@@ -681,7 +772,7 @@ class _BudgetState extends State<Budget> {
           children: [
             SizedBox(height: 10),
             Divider(
-              color: category.color,
+              color: category.getColor(),
               thickness: 5,
             ),
             SizedBox(height: 10),
@@ -706,7 +797,7 @@ class _BudgetState extends State<Budget> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 FloatingActionButton.extended(
-                  onPressed: (){
+                  onPressed: () {
                     showModalBottomSheet(
                       isScrollControlled: true,
                       context: context,
@@ -729,7 +820,8 @@ class _BudgetState extends State<Budget> {
                               child: Column(
                                 children: <Widget>[
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
                                     children: [
                                       IconButton(
                                         icon: const Icon(
@@ -737,7 +829,7 @@ class _BudgetState extends State<Budget> {
                                           Icons.close,
                                         ),
                                         color: Color.fromRGBO(186, 227, 101, 1),
-                                        onPressed: (){
+                                        onPressed: () {
                                           _expenseController.clear();
                                           _amountController.clear();
                                           Navigator.pop(context);
@@ -750,7 +842,8 @@ class _BudgetState extends State<Budget> {
                                         style: GoogleFonts.lato(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 30.0,
-                                          color: Color.fromRGBO(254, 247, 236, 1),
+                                          color:
+                                              Color.fromRGBO(254, 247, 236, 1),
                                         ),
                                       ),
                                       SizedBox(height: 10),
@@ -761,15 +854,25 @@ class _BudgetState extends State<Budget> {
                                         ),
                                         color: Color.fromRGBO(186, 227, 101, 1),
                                         onPressed: () {
-                                          //TODO: adds expense
-                                          if (!(_expenseController.text.isEmpty || _amountController.text.isEmpty)) {
-                                            category.expenses.add(new Expense(_expenseController.text, double.parse(_amountController.text)));
+                                          if (!(_expenseController
+                                                  .text.isEmpty ||
+                                              _amountController.text.isEmpty)) {
+                                            /// @author [MatthewSheldon]
+                                            _financePage.addExpenseToCategory(
+                                                categoryName:
+                                                    category.getCategoryName(),
+                                                expenseName:
+                                                    _expenseController.text,
+                                                expenseBudget: double.parse(
+                                                    _amountController.text));
                                           }
-                                          updateExpenseVals(category);
+                                          _updateBudgetVals();
+                                          _updateEventObject();
+                                          /// end @author [MatthewSheldon]
                                           Navigator.pop(context);
                                           _expenseController.clear();
                                           _amountController.clear();
-                                          setState((){});
+                                          setState(() {});
                                           return;
                                         },
                                       ),
@@ -783,7 +886,8 @@ class _BudgetState extends State<Budget> {
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Padding(
-                                      padding: const EdgeInsets.only(left: 10.0),
+                                      padding:
+                                          const EdgeInsets.only(left: 10.0),
                                       child: TextField(
                                         inputFormatters: [
                                           LengthLimitingTextInputFormatter(20),
@@ -812,7 +916,8 @@ class _BudgetState extends State<Budget> {
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Padding(
-                                      padding: const EdgeInsets.only(left: 10.0),
+                                      padding:
+                                          const EdgeInsets.only(left: 10.0),
                                       child: TextFormField(
                                         inputFormatters: [
                                           LengthLimitingTextInputFormatter(20),
@@ -847,12 +952,12 @@ class _BudgetState extends State<Budget> {
                     style: GoogleFonts.lato(),
                   ),
                   icon: Icon(Icons.add),
-                  backgroundColor: category.color,
+                  backgroundColor: category.getColor(),
                   foregroundColor: Color(0xFFFEF7EC),
                 ),
                 SizedBox(width: 75),
                 FloatingActionButton.extended(
-                  onPressed: (){
+                  onPressed: () {
                     showModalBottomSheet(
                       isScrollControlled: true,
                       context: context,
@@ -875,7 +980,8 @@ class _BudgetState extends State<Budget> {
                               child: Column(
                                 children: <Widget>[
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
                                     children: [
                                       IconButton(
                                         icon: const Icon(
@@ -883,7 +989,7 @@ class _BudgetState extends State<Budget> {
                                           Icons.close,
                                         ),
                                         color: Color.fromRGBO(186, 227, 101, 1),
-                                        onPressed: (){
+                                        onPressed: () {
                                           _categoryController.clear();
                                           _categoryBudgetController.clear();
                                           Navigator.pop(context);
@@ -896,7 +1002,8 @@ class _BudgetState extends State<Budget> {
                                         style: GoogleFonts.lato(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 30.0,
-                                          color: Color.fromRGBO(254, 247, 236, 1),
+                                          color:
+                                              Color.fromRGBO(254, 247, 236, 1),
                                         ),
                                       ),
                                       SizedBox(height: 10),
@@ -908,19 +1015,36 @@ class _BudgetState extends State<Budget> {
                                         color: Color.fromRGBO(186, 227, 101, 1),
                                         onPressed: () {
                                           //TODO: edits category name and/or budget
-                                          if (_categoryController.text.isNotEmpty){
-                                            category.category = _categoryController.text;
+                                          if (_categoryController
+                                              .text.isNotEmpty) {
+                                            /// @author [MatthewSheldon]
+                                            _financePage.updateCategoryName(
+                                                oldName:
+                                                    category.getCategoryName(),
+                                                newName:
+                                                    _categoryController.text);
+                                            /// end @author [MatthewSheldon]
                                           }
-                                          if (_categoryBudgetController.text.isNotEmpty){
-                                            if (isAmountValid(_categoryBudgetController)) {
-                                              category.budget = double.parse(_categoryBudgetController.text);
-                                              updateBudgetVals();
+                                          if (_categoryBudgetController
+                                              .text.isNotEmpty) {
+                                            if (isAmountValid(
+                                                _categoryBudgetController)) {
+                                              /// @author [MatthewSheldon]
+                                              _financePage.updateBudgetForCategory(
+                                                  categoryName: category
+                                                      .getCategoryName(),
+                                                  newBudget: double.parse(
+                                                      _categoryBudgetController
+                                                          .text));
+                                              _updateBudgetVals();
                                             }
                                           }
+                                          _updateEventObject();
+                                          /// end @author [MatthewSheldon]
                                           Navigator.pop(context);
                                           _categoryController.clear();
                                           _categoryBudgetController.clear();
-                                          setState((){});
+                                          setState(() {});
                                           return;
                                         },
                                       ),
@@ -934,7 +1058,8 @@ class _BudgetState extends State<Budget> {
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Padding(
-                                      padding: const EdgeInsets.only(left: 10.0),
+                                      padding:
+                                          const EdgeInsets.only(left: 10.0),
                                       child: TextField(
                                         inputFormatters: [
                                           LengthLimitingTextInputFormatter(20),
@@ -963,7 +1088,8 @@ class _BudgetState extends State<Budget> {
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Padding(
-                                      padding: const EdgeInsets.only(left: 10.0),
+                                      padding:
+                                          const EdgeInsets.only(left: 10.0),
                                       child: TextField(
                                         inputFormatters: [
                                           LengthLimitingTextInputFormatter(20),
@@ -998,7 +1124,7 @@ class _BudgetState extends State<Budget> {
                     style: GoogleFonts.lato(),
                   ),
                   icon: Icon(Icons.edit),
-                  backgroundColor: category.color,
+                  backgroundColor: category.getColor(),
                   foregroundColor: Color.fromRGBO(254, 247, 236, 1),
                 ),
               ],
@@ -1010,19 +1136,22 @@ class _BudgetState extends State<Budget> {
     );
   }
 
-  Widget expensesList(BudgetData category){
+  Widget expensesList(FinanceCategory category) {
+    List<Expense> expenses = category
+        .getListOfExpenses(); // @author [MatthewSheldon] added the list of [Expense] objects
     return Padding(
       padding: const EdgeInsets.all(15.0),
       child: Row(
-        children:[
+        children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children:[
-              for(var i = 0; i < category.expenses.length; i++)(
-                Column(
-                  children:[
+            children: [
+              for (var i = 0; i < expenses.length; i++)
+                (Column(
+                  children: [
                     Text(
-                      category.expenses[i].name,
+                      expenses[i]
+                          .getExpenseName(), // @author [MatthewSheldon] get the name of the [Expense] object
                       style: GoogleFonts.lato(
                         textStyle: TextStyle(
                           color: Colors.black,
@@ -1032,19 +1161,19 @@ class _BudgetState extends State<Budget> {
                     ),
                     SizedBox(height: 10),
                   ],
-                )
-              ),
+                )),
             ],
           ),
           SizedBox(width: 180),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children:[
-              for(var i = 0; i < category.expenses.length; i++)(
-                Column(
-                  children:[
+            children: [
+              for (var i = 0; i < expenses.length; i++)
+                (Column(
+                  children: [
                     Text(
-                      f.format(category.expenses[i].amount),
+                      f.format(expenses[i]
+                          .getExpenseBudget()), // @author [MatthewSheldon] get the budget allocated to the [Expense] object and format it
                       style: GoogleFonts.lato(
                         textStyle: TextStyle(
                           color: Colors.black,
@@ -1054,8 +1183,7 @@ class _BudgetState extends State<Budget> {
                     ),
                     SizedBox(height: 10),
                   ],
-                )
-              )
+                ))
             ],
           ),
         ],
@@ -1063,40 +1191,27 @@ class _BudgetState extends State<Budget> {
     );
   }
 
-  bool isAmountValid(TextEditingController controller){
-    return double.parse(controller.text) <= budget - spent;
+  bool isAmountValid(TextEditingController controller) {
+    return double.parse(controller.text) <= _budgetRemaining;
   }
 
-  bool isCategoryValid(TextEditingController controller){
-    for (var i = 0; i < _budgetList.length; i++){
-      if (_budgetList[i].category == controller.text){
+  bool isCategoryValid(TextEditingController controller) {
+    for (var i = 0; i < _budgetList.length; i++) {
+      if (_budgetList[i].getCategoryName() == controller.text) {
+        // @author [MatthewSheldon] changed it to refer to the [FinanceCategory] object
         return true;
       }
     }
     return false;
   }
 
-  BudgetData getCategory(TextEditingController controller){
-    for (var i = 0; i < _budgetList.length; i++){
-      if (_budgetList[i].category == controller.text){
+  FinanceCategory getCategory(TextEditingController controller) {
+    for (var i = 0; i < _budgetList.length; i++) {
+      if (_budgetList[i].getCategoryName() == controller.text) {
+        // @author [MatthewSheldon] changed it to refer to the [FinanceCategory] object
         return _budgetList[i];
       }
     }
     return _budgetList[0];
   }
-}
-
-class BudgetData{
-  BudgetData(this.category, this.budget, this.color);
-  String category;
-  double budget;
-  Color color;
-  double moneySpent = 0;
-  List<Expense> expenses = [];
-}
-
-class Expense{
-  Expense(this.name, this.amount);
-  String name;
-  double amount;
 }
