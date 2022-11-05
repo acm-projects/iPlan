@@ -43,7 +43,7 @@ late double _budgetRemaining;
 /// The percent of the budget that has been used
 late double _percent;
 
-int colorsIndex = 0;
+late int colorsIndex;
 
 /// @author [MatthewSheldon]
 /// Used to update the [Event] object in the cloud
@@ -75,6 +75,7 @@ class Budget extends StatefulWidget {
     _event = event;
     _financePage = _event.getFinancePage();
     _updateBudgetVals();
+    colorsIndex = (_financePage.getFinanceCategories().length - 1) % 8;
   }
 
   @override
@@ -356,6 +357,11 @@ class _BudgetState extends State<Budget> {
                                                       _categoryBudgetController
                                                           .text.isEmpty)) {
                                                     /// @author [MatthewSheldon] changed from updating the
+                                                    colorsIndex = (_financePage
+                                                              .getFinanceCategories()
+                                                              .length -
+                                                          1) %
+                                                      8;
                                                     _financePage.addCategory(
                                                         categoryName:
                                                             _categoryController
@@ -365,21 +371,9 @@ class _BudgetState extends State<Budget> {
                                                                 .text),
                                                         color: colors[
                                                             colorsIndex]);
-
-                                                    /// end @author [MatthewSheldon]
                                                   }
-                                                  print("Before $colorsIndex");
-                                                  if (colorsIndex < 7) {
-                                                    colorsIndex++;
-                                                  } else {
-                                                    colorsIndex = 0;
-                                                  }
-                                                  print("After $colorsIndex");
-
-                                                  /// @author [MatthewSheldon]
                                                   _updateBudgetVals();
                                                   _updateEventObject();
-
                                                   /// end @author [MatthewSheldon]
                                                   Navigator.pop(context);
                                                   _categoryController.clear();
@@ -552,7 +546,6 @@ class _BudgetState extends State<Budget> {
                                                                 .text);
                                                     _updateBudgetVals();
                                                     _updateEventObject();
-
                                                     /// end @author [MatthewSheldon]
                                                     Navigator.pop(context);
                                                   }
@@ -1157,7 +1150,8 @@ class _BudgetState extends State<Budget> {
                 (Column(
                   children: [
                     Text(
-                      expenses[i].getExpenseName().padRight(20, '   '), // @author [MatthewSheldon] get the name of the [Expense] object
+                      expenses[i].getExpenseName().padRight(20,
+                          '   '), // @author [MatthewSheldon] get the name of the [Expense] object
                       style: GoogleFonts.lato(
                         textStyle: TextStyle(
                           color: Colors.black,

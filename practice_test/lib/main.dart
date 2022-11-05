@@ -9,10 +9,7 @@ import 'Backend/User_Creation/user.dart';
 import 'Backend/User_Creation/user_assembler.dart';
 import 'Backend/User_Creation/user_creator.dart';
 
-import 'Frontend/Calendar/calendar.dart';
-import 'Frontend/Collaboration/collaboration.dart';
-import 'Frontend/Finance/budget.dart';
-import 'Frontend/Event_Manager/events_home_page.dart';
+import 'home.dart';
 
 late User user;
 
@@ -74,7 +71,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: Budget(user: user, event: event),
+      home: Home(user: user, event: event),
     );
   }
 }

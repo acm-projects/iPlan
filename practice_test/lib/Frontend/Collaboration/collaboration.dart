@@ -88,32 +88,6 @@ class _CollaborationState extends State<Collaboration> {
               ),
             ),
           ),
-
-          //Casi - Changed Nav bar
-          bottomNavigationBar: BottomNavigationBar(
-              type: BottomNavigationBarType.fixed,
-              backgroundColor: Color(0xFFA3B0EB),
-              selectedItemColor: Color.fromRGBO(254, 247, 236, 1),
-              unselectedItemColor: Colors.black,
-              showSelectedLabels: true,
-              showUnselectedLabels: false,
-              landscapeLayout: BottomNavigationBarLandscapeLayout.centered,
-              items: [
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.home, size: 30), label: 'Home'),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.calendar_month, size: 30),
-                    label: 'Calendar'),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.wallet, size: 30), label: 'Budget'),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.schedule, size: 30), label: 'Itinerary'),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.person_add, size: 30),
-                    label: 'Collaborate'),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.settings, size: 30), label: 'Settings')
-              ]),
         ));
   }
 }
@@ -219,7 +193,7 @@ class _WhiteSquareState extends State<WhiteSquare> {
     /// end @author [MatthewSheldon]
 
     return Container(
-        height: 683.4,
+        height: 700,
         color: Colors.transparent,
         child: Container(
             decoration: const BoxDecoration(
