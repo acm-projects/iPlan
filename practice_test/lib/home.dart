@@ -6,6 +6,7 @@ import 'Frontend/Finance/budget.dart';
 import 'Frontend/Collaboration/collaboration.dart';
 import 'Frontend/Calendar/calendar.dart';
 import 'Frontend/Home_Page/eventHome.dart';
+import 'Frontend/Itinerary/itinerary.dart';
 import 'Frontend/Settings/settings.dart';
 
 import 'Backend/User_Creation/user.dart';
@@ -36,7 +37,7 @@ class _HomeState extends State<Home> {
     EventHome(),
     Calendar(user: _user, event: _event),
     Budget(user: _user, event: _event),
-    Budget(user: _user, event: _event),
+    Itinerary(user: _user, event: _event),
     Collaboration(user: _user, event: _event),
     Settings(),
   ];

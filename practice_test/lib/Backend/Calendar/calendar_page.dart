@@ -8,7 +8,7 @@ import 'task.dart';
 /// date they need to be completed by as well as a name for each task
 class CalendarPage {
   /// The list of [Task] objects for the current event
-  static late List<Task> _tasks;
+  late List<Task> _tasks;
 
   /// Creates a [CalendarPage] object with the passed [title] and [date]
   /// parameters
