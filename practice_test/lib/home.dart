@@ -34,7 +34,7 @@ class _HomeState extends State<Home> {
   int currentIndex = 0;
 
   final screens = [
-    EventHome(),
+    EventHome(user: _user, event: _event),
     Calendar(user: _user, event: _event),
     Budget(user: _user, event: _event),
     Itinerary(user: _user, event: _event),
