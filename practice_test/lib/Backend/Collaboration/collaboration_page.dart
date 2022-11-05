@@ -22,8 +22,7 @@ class CollaborationPage {
   late List<Contact> _contacts;
 
   /// The mapping between names of contacts and [Contact] objects
-  late ContactMap
-      _contactMap; // TODO: remove [ContactMap] if it is no longer a needed class
+  late ContactMap _contactMap;
 
   /// The tool used to request contact permissions and scrape the user's contacts
   late ContactPuller _contactPuller;
@@ -58,7 +57,7 @@ class CollaborationPage {
     _date = json["date"];
     List<dynamic> collaboratorsData = json["collaborators"] as List<dynamic>;
     _collaborators = collaboratorsData
-        .map((collaborator) => Collaborator.fromJson(collaborator))
+        .map((collaborator) => Collaborator.fromJson(json: collaborator))
         .toList();
     _inviteLink = link;
   }
@@ -192,22 +191,25 @@ class CollaborationPage {
     _collaborators.add(Collaborator.fromUser(user: user));
   }
 
+  void addCollaboratorFromCollaborator({required Collaborator collaborator}) {
+    _collaborators.add(collaborator);
+  }
+
   /// Updates the [Collaborator] object described by the passed [oldUserID]
   /// parameter with the information contained in the passed [User] object
   void updateCollaborator({required String oldUserID, required User user}) {
     for (int i = 0; i < _collaborators.length; i++) {
-      Collaborator collaborator = _collaborators[i];
-      if (collaborator.getUserID() == oldUserID) {
-        collaborator.updateUserID(userID: user.getUserID());
-        collaborator.updateEmail(email: user.getEmail());
-        collaborator.updateName(name: user.getUserName());
-        collaborator.updateHasAccepted(hasAccepted: true);
+      if (_collaborators[i].getUserID() == oldUserID) {
+        _collaborators[i].updateUserID(userID: user.getUserID());
+        _collaborators[i].updateEmail(email: user.getEmail());
+        _collaborators[i].updateName(name: user.getUserName());
+        _collaborators[i].updateHasAccepted(hasAccepted: true);
         break;
       }
     }
   }
 
-  /// Deconstructs the current [CollaborationPage] object in a JSON format
+  /// Converts the current [CollaborationPage] object into a json file formatted [Map]
   Map<String, dynamic> toJson() {
     return {
       "date": _date,

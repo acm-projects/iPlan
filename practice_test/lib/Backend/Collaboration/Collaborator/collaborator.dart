@@ -2,8 +2,8 @@ import '../../User_Creation/user.dart';
 import 'null_parameter_exception.dart';
 
 /// @author [MatthewSheldon]
-/// The [Collaborator] object represents the information for an individual 
-/// collaborator. These forms of information include [_userID], [_name], 
+/// The [Collaborator] object represents the information for an individual
+/// collaborator. These forms of information include [_userID], [_name],
 /// [_email], [_phoneNumber], [_userID], and [_hasAccepted].
 class Collaborator implements Comparable<Collaborator> {
   /// The name of the collaborator
@@ -31,7 +31,8 @@ class Collaborator implements Comparable<Collaborator> {
       {required String name,
       String email = "null",
       String phoneNumber = "null",
-      required bool hasAccepted}) {
+      required bool hasAccepted,
+      String userID = ""}) {
     if (email == "null" && phoneNumber == "null") {
       throw NullParameterException();
     } else {
@@ -39,7 +40,7 @@ class Collaborator implements Comparable<Collaborator> {
       _email = email;
       _phoneNumber = phoneNumber;
       _hasAccepted = hasAccepted;
-      // TODO: create a temporary user ID in place of what will eventually be the real one
+      _userID = userID;
     }
   }
 
@@ -53,8 +54,7 @@ class Collaborator implements Comparable<Collaborator> {
   }
 
   /// Constructs a [Collaborator] object from the passed [json] file
-  /// decomposition of a [Collaborator] object.
-  Collaborator.fromJson(Map<String, dynamic> json) {
+  Collaborator.fromJson({required Map<String, dynamic> json}) {
     if (json["email"] == "null" && json["phoneNumber"] == "null") {
       throw NullParameterException();
     } else {
@@ -110,7 +110,7 @@ class Collaborator implements Comparable<Collaborator> {
     _hasAccepted = hasAccepted;
   }
 
-  /// Deconstructs the current [Collaborator] object in a JSON format
+  /// Converts the current [Collaborator] object into a json file formatted [Map]
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       "hasAccepted": _hasAccepted,
