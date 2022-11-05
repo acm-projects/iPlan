@@ -293,7 +293,6 @@ class _CalendarState extends State<Calendar> {
                                       time: _timeController);
                                   _updateEventObject();
                                   _buildSelectedTasksFromCalendarPage();
-                                  print(selectedDay.toString());
 
                                   /// end @author [MatthewSheldon]
                                 }
@@ -363,7 +362,7 @@ class _CalendarState extends State<Calendar> {
                               _timeController = (await showTimePicker(
                                 context: context,
                                 initialTime: TimeOfDay.now(),
-                              ))!;
+                              )) ?? const TimeOfDay(hour: 0, minute: 0);
                             },
                           ),
                         ),

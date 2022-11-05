@@ -74,7 +74,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: Calendar(user: user, event: event),
+      home: Budget(user: user, event: event),
     );
   }
 }

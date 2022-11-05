@@ -43,6 +43,8 @@ late double _budgetRemaining;
 /// The percent of the budget that has been used
 late double _percent;
 
+int colorsIndex = 0;
+
 /// @author [MatthewSheldon]
 /// Used to update the [Event] object in the cloud
 void _updateEventObject() async {
@@ -90,7 +92,6 @@ class _BudgetState extends State<Budget> {
     Color(0xFF65E3CD),
     Color(0xFFFFA500)
   ];
-  int colorsIndex = 0;
 
   late TooltipBehavior _tooltipBehavior;
   var f = NumberFormat("\$###,##0.00");
@@ -367,11 +368,13 @@ class _BudgetState extends State<Budget> {
 
                                                     /// end @author [MatthewSheldon]
                                                   }
+                                                  print("Before $colorsIndex");
                                                   if (colorsIndex < 7) {
                                                     colorsIndex++;
                                                   } else {
                                                     colorsIndex = 0;
                                                   }
+                                                  print("After $colorsIndex");
 
                                                   /// @author [MatthewSheldon]
                                                   _updateBudgetVals();
@@ -404,7 +407,7 @@ class _BudgetState extends State<Budget> {
                                             child: TextField(
                                               inputFormatters: [
                                                 LengthLimitingTextInputFormatter(
-                                                    20),
+                                                    10),
                                               ],
                                               controller: _categoryController,
                                               style: GoogleFonts.lato(
@@ -437,7 +440,7 @@ class _BudgetState extends State<Budget> {
                                             child: TextField(
                                               inputFormatters: [
                                                 LengthLimitingTextInputFormatter(
-                                                    20),
+                                                    10),
                                               ],
                                               controller:
                                                   _categoryBudgetController,
@@ -549,6 +552,7 @@ class _BudgetState extends State<Budget> {
                                                                 .text);
                                                     _updateBudgetVals();
                                                     _updateEventObject();
+
                                                     /// end @author [MatthewSheldon]
                                                     Navigator.pop(context);
                                                   }
@@ -645,7 +649,7 @@ class _BudgetState extends State<Budget> {
                 Container(
                   height: 100,
                   width: 100,
-                  margin: EdgeInsets.fromLTRB(0.0, 0.0, 30.0, 0.0),
+                  margin: EdgeInsets.fromLTRB(0.0, 0.0, 10.0, 0.0),
                   decoration: BoxDecoration(
                     color: category.getColor(),
                     shape: BoxShape.circle,
@@ -724,7 +728,7 @@ class _BudgetState extends State<Budget> {
                             ),
                           ],
                         ),
-                        SizedBox(width: 40),
+                        SizedBox(width: 5),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -868,6 +872,7 @@ class _BudgetState extends State<Budget> {
                                           }
                                           _updateBudgetVals();
                                           _updateEventObject();
+
                                           /// end @author [MatthewSheldon]
                                           Navigator.pop(context);
                                           _expenseController.clear();
@@ -920,7 +925,7 @@ class _BudgetState extends State<Budget> {
                                           const EdgeInsets.only(left: 10.0),
                                       child: TextFormField(
                                         inputFormatters: [
-                                          LengthLimitingTextInputFormatter(20),
+                                          LengthLimitingTextInputFormatter(10),
                                         ],
                                         controller: _amountController,
                                         style: GoogleFonts.lato(
@@ -955,7 +960,7 @@ class _BudgetState extends State<Budget> {
                   backgroundColor: category.getColor(),
                   foregroundColor: Color(0xFFFEF7EC),
                 ),
-                SizedBox(width: 75),
+                SizedBox(width: 25),
                 FloatingActionButton.extended(
                   onPressed: () {
                     showModalBottomSheet(
@@ -1023,6 +1028,7 @@ class _BudgetState extends State<Budget> {
                                                     category.getCategoryName(),
                                                 newName:
                                                     _categoryController.text);
+
                                             /// end @author [MatthewSheldon]
                                           }
                                           if (_categoryBudgetController
@@ -1040,6 +1046,7 @@ class _BudgetState extends State<Budget> {
                                             }
                                           }
                                           _updateEventObject();
+
                                           /// end @author [MatthewSheldon]
                                           Navigator.pop(context);
                                           _categoryController.clear();
@@ -1062,7 +1069,7 @@ class _BudgetState extends State<Budget> {
                                           const EdgeInsets.only(left: 10.0),
                                       child: TextField(
                                         inputFormatters: [
-                                          LengthLimitingTextInputFormatter(20),
+                                          LengthLimitingTextInputFormatter(10),
                                         ],
                                         controller: _categoryController,
                                         style: GoogleFonts.lato(
@@ -1092,7 +1099,7 @@ class _BudgetState extends State<Budget> {
                                           const EdgeInsets.only(left: 10.0),
                                       child: TextField(
                                         inputFormatters: [
-                                          LengthLimitingTextInputFormatter(20),
+                                          LengthLimitingTextInputFormatter(10),
                                         ],
                                         controller: _categoryBudgetController,
                                         style: GoogleFonts.lato(
@@ -1150,8 +1157,7 @@ class _BudgetState extends State<Budget> {
                 (Column(
                   children: [
                     Text(
-                      expenses[i]
-                          .getExpenseName(), // @author [MatthewSheldon] get the name of the [Expense] object
+                      expenses[i].getExpenseName().padRight(20, '   '), // @author [MatthewSheldon] get the name of the [Expense] object
                       style: GoogleFonts.lato(
                         textStyle: TextStyle(
                           color: Colors.black,
@@ -1164,7 +1170,7 @@ class _BudgetState extends State<Budget> {
                 )),
             ],
           ),
-          SizedBox(width: 180),
+          SizedBox(width: 30),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

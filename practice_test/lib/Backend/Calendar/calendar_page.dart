@@ -45,14 +45,6 @@ class CalendarPage {
   }
 
   /// @author [MatthewSheldon]
-  /// Helper method for [Event.fromJson] constructor that takes a [TimeOfDay]
-  /// formatted [String] and returns the converted [TimeOfDay] equivalent object.
-  TimeOfDay _getTimeFromString(String time) {
-    List<String> split = time.split(":");
-    return TimeOfDay(hour: int.parse(split[0]), minute: int.parse(split[1]));
-  }
-
-  /// @author [MatthewSheldon]
   /// Converts the current [Event] object into a json file formatted [Map]
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
