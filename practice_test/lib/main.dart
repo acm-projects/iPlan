@@ -9,6 +9,8 @@ import 'Backend/User_Creation/user.dart';
 import 'Backend/User_Creation/user_assembler.dart';
 import 'Backend/User_Creation/user_creator.dart';
 
+import 'Frontend/Authentication/welcomePage.dart';
+import 'Frontend/Event_Manager/events_home_page.dart';
 import 'home.dart';
 
 late User user;
@@ -59,7 +61,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "Budget Home Page",
+      title: "iPlan",
       theme: ThemeData(
         timePickerTheme: _timePickerTheme,
         textButtonTheme: TextButtonThemeData(
@@ -71,7 +73,10 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: Home(user: user, event: event),
+      // routes: {
+      //   '/': (context) => WelcomePage(),
+      // },
+      home: WelcomePage(),
     );
   }
 }

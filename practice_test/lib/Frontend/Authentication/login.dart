@@ -6,9 +6,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'register.dart';
+import 'forgotPass.dart';
+
+import '../Event_Manager/events_home_page.dart';
+
 import '../../Backend/Authentication/log_in_authentication.dart';
 import '../../Backend/User_Creation/user_assembler.dart';
 import '../../Backend/User_Creation/user.dart';
+
+/// The following [User] object holds all of the info for the logged in user
+late User _userObj;
 
 class Login extends StatefulWidget {
   /// @author [MatthewSheldon]
@@ -17,9 +25,6 @@ class Login extends StatefulWidget {
   static const int invalidEmailOrPassword = 1;
   static const int userIDToUserFileFailedToFetch = 2;
   static const int oneOrMoreEventFilesFailedToFetch = 3;
-
-  /// The following [User] object holds all of the info for the logged in user
-  static late User _userObj;
 
   @override
   _LoginState createState() => _LoginState();
@@ -97,27 +102,6 @@ Widget password(TextEditingController _passwordController) {
   );
 }
 
-Widget forgotPassword() {
-  return Container(
-    alignment: Alignment.center,
-    child: TextButton(
-      style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.all(Colors.transparent),
-      ),
-      onPressed: () => print("Forgot Password"),
-      child: Text(
-        'Forgot password?',
-        style: GoogleFonts.lato(
-          textStyle: TextStyle(
-            color: Color.fromRGBO(254, 247, 236, 1),
-            fontSize: 15.0,
-          ),
-        ),
-      ),
-    ),
-  );
-}
-
 class _LoginState extends State<Login> {
   //text controllers
   final _emailController = TextEditingController();
@@ -157,6 +141,27 @@ class _LoginState extends State<Login> {
         // The user's email or password do not match
         return Login.invalidEmailOrPassword;
       }
+    }
+
+      Widget forgotPassword() {
+      return Container(
+        alignment: Alignment.center,
+        child: TextButton(
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(Colors.transparent),
+          ),
+          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => forgotPass())),
+          child: Text(
+            'Forgot password?',
+            style: GoogleFonts.lato(
+              textStyle: TextStyle(
+                color: Color.fromRGBO(254, 247, 236, 1),
+                fontSize: 15.0,
+              ),
+            ),
+          ),
+        ),
+      );
     }
 
     return Scaffold(
@@ -207,7 +212,7 @@ class _LoginState extends State<Login> {
                               int code = await signIn();
                               print("\nError/Success code: ${code}\n");
                               if (code == Login.success) {
-                                // TODO: Transition to the home page
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => EventsHomePage(user: _userObj)));
                               } else if (code ==
                                   Login.oneOrMoreEventFilesFailedToFetch) {
                                 // TODO: Transition to the home page, but alert the user that one or more events failed to be retrieved
@@ -264,7 +269,7 @@ class _LoginState extends State<Login> {
                                 backgroundColor: MaterialStateProperty.all(
                                     Colors.transparent),
                               ),
-                              onPressed: () => print("Reroute to sign up page"),
+                              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => Register())),
                               child: Text(
                                 'Sign up now!',
                                 style: GoogleFonts.lato(

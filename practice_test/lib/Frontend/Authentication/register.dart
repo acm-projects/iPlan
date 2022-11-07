@@ -6,9 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'login.dart';
+import '../Event_Manager/events_home_page.dart';
+
 import '../../Backend/User_Creation/user_assembler.dart';
 import '../../Backend/User_Creation/user_creator.dart';
 import '../../Backend/User_Creation/user.dart';
+
+/// The following [User] object holds all of the info for the registered user
+late User _userObj;
 
 class Register extends StatefulWidget {
   /// @author [MatthewSheldon]
@@ -18,9 +24,6 @@ class Register extends StatefulWidget {
   static const int userFileFailedUpload = 2;
   static const int userIDToUserFileFailedToFetch = 3;
   static const int oneOrMoreEventFilesFailedToFetch = 4;
-
-  /// The following [User] object holds all of the info for the registered user
-  static late User _userObj;
 
   @override
   _RegisterState createState() => _RegisterState();
@@ -266,7 +269,7 @@ class _RegisterState extends State<Register> {
                               int code = await signUp();
                               print(code);
                               if (code == Register.success) {
-                                // TODO: Frontend, transition to the home page from here
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => EventsHomePage(user: _userObj)));
                               } else if (code ==
                                   Register.oneOrMoreEventFilesFailedToFetch) {
                                 // TODO: Frontend, transition to the home page, but alert the user that
@@ -332,7 +335,7 @@ class _RegisterState extends State<Register> {
                                 backgroundColor: MaterialStateProperty.all(
                                     Colors.transparent),
                               ),
-                              onPressed: () => print("Reroute to login page"),
+                              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => Login())),
                               child: Text(
                                 'Login now!',
                                 style: GoogleFonts.lato(

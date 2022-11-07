@@ -112,7 +112,7 @@ class _CalendarState extends State<Calendar> {
         children: [
           //title of page
           Padding(
-            padding: EdgeInsets.fromLTRB(0.0, 50.0, 0.0, 5.0),
+            padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
             child: Center(
               child: Text.rich(
                 TextSpan(
@@ -131,7 +131,7 @@ class _CalendarState extends State<Calendar> {
           Padding(
             padding: EdgeInsets.fromLTRB(0.0, 9.0, 0.0, 0.0),
             child: Container(
-              height: size.height - 184.0,
+              height: size.height - 229.0,
               decoration: BoxDecoration(
                 color: Color(0xFFFEF7EC),
                 borderRadius: BorderRadius.only(
@@ -231,6 +231,7 @@ class _CalendarState extends State<Calendar> {
       ),
       //button to add new task
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'calbtn1',
         onPressed: () {
           showModalBottomSheet(
             isScrollControlled: true,

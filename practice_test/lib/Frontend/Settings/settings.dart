@@ -64,7 +64,7 @@ class _SettingsState extends State<Settings> {
       body: Column(
         children: [
           Padding(
-            padding: EdgeInsets.fromLTRB(0.0, 50.0, 0.0, 5.0),
+            padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
             child: Center(
               child: Text.rich(
                 TextSpan(
@@ -84,7 +84,7 @@ class _SettingsState extends State<Settings> {
             child: Padding(
               padding: EdgeInsets.fromLTRB(0.0, 9.0, 0.0, 0.0),
               child: Container(
-                height: size.height - 184.0,
+                height: size.height - 229.0,
                 decoration: BoxDecoration(
                   color: Color(0xFFFEF7EC),
                   borderRadius: BorderRadius.only(
@@ -231,6 +231,7 @@ class _SettingsState extends State<Settings> {
                       padding: EdgeInsets.symmetric(horizontal: 175.0),
                       width: 50.0,
                       child: FloatingActionButton(
+                        heroTag: "settings1",
                         //TODO: reroute to welcome screen
                         onPressed: () => print("Do Something"),
                         elevation: 5,

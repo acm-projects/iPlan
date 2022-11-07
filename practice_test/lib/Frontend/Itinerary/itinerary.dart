@@ -62,32 +62,31 @@ class _ItineraryState extends State<Itinerary> {
   TextEditingController _eventDescriptionTextEditor = TextEditingController();
 
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     Future updateInfo() async {
       //for backend
     }
 
-    return MaterialApp(
-      title: 'Itinerary Page',
-      home: Scaffold(
+    return Scaffold(
         backgroundColor: Color(0xFF657BE3),
         body: Center(
             child: Center(
                 child: Column(
           children: <Widget>[
             Padding(
-                padding: EdgeInsets.fromLTRB(0.0, 40.0, 0.0, 5.0),
+                padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
                 child: Center(
                   child: Text(_event.getEventName(),
                       style: GoogleFonts.lato(
-                          fontSize: 40.0,
+                          fontSize: 50.0,
                           color: Color(0xFFFEF7EC),
                           fontWeight: FontWeight.bold)),
                 )),
             Padding(
-                padding: EdgeInsets.fromLTRB(0.0, 20.0, 0.0, 0.0),
+                padding: EdgeInsets.fromLTRB(0.0, 9.0, 0.0, 0.0),
                 child: Center(
                     child: Container(
-                  height: 610.0,
+                  height: size.height - 229,
                   color: Colors.transparent,
                   child: Container(
                     decoration: const BoxDecoration(
@@ -233,6 +232,7 @@ class _ItineraryState extends State<Itinerary> {
                                 EdgeInsets.fromLTRB(275.0, 20.0, 0.0, 10.0),
                             child: FloatingActionButton(
                                 backgroundColor: Color(0xFFBAE365),
+                                heroTag: "itinerary1",
                                 onPressed: () {
                                   //When the button is clicked, displays the CreateTimePopup
                                   showModalBottomSheet(
@@ -340,8 +340,7 @@ class _ItineraryState extends State<Itinerary> {
                 )))
           ],
         ))),
-      ),
-    );
+      );
   }
 }
 
