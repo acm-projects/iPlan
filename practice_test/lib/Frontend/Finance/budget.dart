@@ -118,7 +118,7 @@ class _BudgetState extends State<Budget> {
       body: Column(
         children: [
           Padding(
-            padding: EdgeInsets.fromLTRB(0.0, 50.0, 0.0, 5.0),
+            padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
             child: Center(
               child: Text.rich(
                 TextSpan(
@@ -138,7 +138,7 @@ class _BudgetState extends State<Budget> {
             child: Padding(
               padding: EdgeInsets.fromLTRB(0.0, 9.0, 0.0, 0.0),
               child: Container(
-                height: size.height - 184.0,
+                height: size.height - 229.0,
                 decoration: BoxDecoration(
                   color: Color(0xFFFEF7EC),
                   borderRadius: BorderRadius.only(
@@ -289,6 +289,7 @@ class _BudgetState extends State<Budget> {
                     Padding(
                       padding: const EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 0.0),
                       child: FloatingActionButton.extended(
+                        heroTag: 'budget1',
                         onPressed: () {
                           showModalBottomSheet(
                             isScrollControlled: true,
@@ -477,6 +478,7 @@ class _BudgetState extends State<Budget> {
                       Padding(
                         padding: const EdgeInsets.all(15.0),
                         child: FloatingActionButton.extended(
+                          heroTag: 'budget2',
                           onPressed: () {
                             showModalBottomSheet(
                               isScrollControlled: true,
@@ -794,6 +796,7 @@ class _BudgetState extends State<Budget> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 FloatingActionButton.extended(
+                  heroTag: 'budget3',
                   onPressed: () {
                     showModalBottomSheet(
                       isScrollControlled: true,
@@ -955,6 +958,7 @@ class _BudgetState extends State<Budget> {
                 ),
                 SizedBox(width: 25),
                 FloatingActionButton.extended(
+                  heroTag: 'budget4',
                   onPressed: () {
                     showModalBottomSheet(
                       isScrollControlled: true,

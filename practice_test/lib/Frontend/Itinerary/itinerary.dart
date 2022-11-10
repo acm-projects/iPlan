@@ -62,32 +62,31 @@ class _ItineraryState extends State<Itinerary> {
   TextEditingController _eventDescriptionTextEditor = TextEditingController();
 
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     Future updateInfo() async {
       //for backend
     }
 
-    return MaterialApp(
-      title: 'Itinerary Page',
-      home: Scaffold(
+    return Scaffold(
         backgroundColor: Color(0xFF657BE3),
         body: Center(
             child: Center(
                 child: Column(
           children: <Widget>[
             Padding(
-                padding: EdgeInsets.fromLTRB(0.0, 40.0, 0.0, 5.0),
+                padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
                 child: Center(
                   child: Text(_event.getEventName(),
                       style: GoogleFonts.lato(
-                          fontSize: 40.0,
+                          fontSize: 50.0,
                           color: Color(0xFFFEF7EC),
                           fontWeight: FontWeight.bold)),
                 )),
             Padding(
-                padding: EdgeInsets.fromLTRB(0.0, 20.0, 0.0, 0.0),
+                padding: EdgeInsets.fromLTRB(0.0, 9.0, 0.0, 0.0),
                 child: Center(
                     child: Container(
-                  height: 610.0,
+                  height: size.height - 229,
                   color: Colors.transparent,
                   child: Container(
                     decoration: const BoxDecoration(
@@ -230,84 +229,65 @@ class _ItineraryState extends State<Itinerary> {
                           //This is the add button that goes at the very bottom
                           Padding(
                             padding:
-                                EdgeInsets.fromLTRB(275.0, 20.0, 0.0, 10.0),
-                            child: FloatingActionButton(
-                                backgroundColor: Color(0xFFBAE365),
-                                onPressed: () {
-                                  //When the button is clicked, displays the CreateTimePopup
-                                  showModalBottomSheet(
-                                    context: context,
-                                    isScrollControlled: true,
-                                    builder: (context) => SingleChildScrollView(
-                                      child: Container(
-                                        padding: EdgeInsets.only(
-                                            bottom: MediaQuery.of(context)
-                                                .viewInsets
-                                                .bottom),
-                                        child: Container(
-                                            color: Color(0xFF757575),
-                                            child: Container(
-                                              padding: EdgeInsets.all(20.0),
-                                              decoration: BoxDecoration(
-                                                color: Color(0xFFFEF7EC),
-                                                borderRadius: BorderRadius.only(
-                                                    topLeft:
-                                                        Radius.circular(20.0),
-                                                    topRight:
-                                                        Radius.circular(20.0)),
-                                              ),
-                                              child: Column(children: [
-                                                Text("New Time Slot",
-                                                    style: GoogleFonts.lato(
-                                                        fontSize: 20,
-                                                        fontWeight:
-                                                            FontWeight.bold)),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: EventTime(),
-                                                ),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: TextField(
-                                                      controller:
-                                                          _eventDescriptionTextEditor,
-                                                      decoration:
-                                                          InputDecoration(
-                                                        hintText:
-                                                            "Event Description",
-                                                        filled: true,
-                                                        fillColor:
-                                                            Color(0xFFECECEC),
-                                                        enabledBorder:
-                                                            OutlineInputBorder(
-                                                          borderSide:
-                                                              const BorderSide(
-                                                                  width: 3,
-                                                                  color: Color(
-                                                                      0xFFECECEC)),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(20),
-                                                        ),
-                                                      )),
-                                                ),
-                                                ListTile(
-                                                  leading: TextButton(
-                                                    child: Text("Close",
-                                                        style:
-                                                            GoogleFonts.lato()),
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                    },
-                                                  ),
-                                                  trailing: TextButton(
-                                                      child: Text("Create",
-                                                          style: GoogleFonts
-                                                              .lato()),
-                                                      onPressed: () {
-                                                        var _eventDescription =
+                                EdgeInsets.fromLTRB(275.0, 20.0, 20.0, 10.0),
+                            child: FloatingActionButton.extended(
+        heroTag: 'itinerary1',
+        onPressed: () {
+          showModalBottomSheet(
+            isScrollControlled: true,
+            context: context,
+            builder: (context) => SingleChildScrollView(
+              child: Container(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                ),
+                child: Container(
+                  color: Color(0xff757575),
+                  child: Container(
+                    padding: EdgeInsets.all(20.0),
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(101, 123, 227, 1),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20.0),
+                        topRight: Radius.circular(20.0),
+                      ),
+                    ),
+                    child: Column(
+                      children: <Widget>[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            IconButton(
+                              icon: const Icon(
+                                size: 40.0,
+                                Icons.close,
+                              ),
+                              color: Color.fromRGBO(186, 227, 101, 1),
+                              onPressed: () {
+                                _eventTimeTextEditor.clear();
+					  _eventDescriptionTextEditor.clear();
+                                Navigator.pop(context);
+                              },
+                            ),
+                            SizedBox(height: 10),
+                            Text(
+                              "Add Timeslot",
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.lato(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 30.0,
+                                color: Color.fromRGBO(254, 247, 236, 1),
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            IconButton(
+                              icon: const Icon(
+                                size: 40.0,
+                                Icons.check_circle,
+                              ),
+                              color: Color.fromRGBO(186, 227, 101, 1),
+                              onPressed: () {
+                                var _eventDescription =
                                                             _eventDescriptionTextEditor
                                                                 .text;
                                                         // addTime(_timeOfDay, _eventDescription); Cassis method that was here before
@@ -323,15 +303,56 @@ class _ItineraryState extends State<Itinerary> {
                                                         _updateEventObject();
                                                         setState(() {});
                                                         Navigator.pop(context);
-                                                      }),
-                                                ),
-                                              ]),
-                                            )),
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: Icon(Icons.add)),
+                              },
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 25),
+                        //timeslot name
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Color.fromRGBO(254, 247, 236, 1),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 10.0),
+                            child: TextField(
+                              controller: _eventDescriptionTextEditor,
+                              style: GoogleFonts.lato(
+                                color: Colors.black,
+                              ),
+                              cursorColor: Colors.black,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: 'Timeslot Name',
+                                prefixIcon: Icon(
+                                  Icons.event_available,
+                                  color: Color(0xFF657BE3),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        //select time
+                        EventTime(),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+        label: Text(
+          "Add Time",
+          style: GoogleFonts.lato(),
+        ),
+        icon: Icon(Icons.add),
+        backgroundColor: Color.fromRGBO(186, 227, 101, 1),
+        foregroundColor: Colors.black,
+      ),
+                                
                           )
                         ]),
                       ),
@@ -340,8 +361,7 @@ class _ItineraryState extends State<Itinerary> {
                 )))
           ],
         ))),
-      ),
-    );
+      );
   }
 }
 

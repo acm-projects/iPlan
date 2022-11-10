@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../Authentication/login.dart';
+import '../../home.dart';
+
 import '../../Backend/Event_Manager/event.dart';
 import '../../Backend/Event_Manager/event_creator.dart';
 import '../../Backend/User_Creation/user.dart';
@@ -122,53 +125,59 @@ class _EventsHomeState extends State<EventsHomePage> {
                                     padding: EdgeInsets.fromLTRB(
                                         5.0, 15.0, 5.0, 15.0),
                                     //each event widget is a button that will take a user to that event's specific page
-                                    child: ElevatedButton(
-                                        child: ListTile(
-                                          //filled in circle with number of days left and "days left" text as the leading widget
-                                          leading: CircleAvatar(
-                                              child: Column(children: [
-                                                Padding(
-                                                  padding: EdgeInsets.fromLTRB(
-                                                      0.0, 5.0, 0.0, 0.0),
-                                                  child: Text(
-                                                      _daysLeft[index]
-                                                          .toString(),
+                                    child: Hero(
+                                      tag: '$index',
+                                      child: ElevatedButton(
+                                          child: ListTile(
+                                            //filled in circle with number of days left and "days left" text as the leading widget
+                                            leading: CircleAvatar(
+                                                child: Column(children: [
+                                                  Padding(
+                                                    padding: EdgeInsets.fromLTRB(
+                                                        0.0, 5.0, 0.0, 0.0),
+                                                    child: Text(
+                                                        _daysLeft[index]
+                                                            .toString(),
+                                                        style: GoogleFonts.lato(
+                                                            color:
+                                                                Color(0xFFFEF7EC),
+                                                            fontSize: 25)),
+                                                  ),
+                                                  Text("days left",
                                                       style: GoogleFonts.lato(
                                                           color:
                                                               Color(0xFFFEF7EC),
-                                                          fontSize: 25)),
-                                                ),
-                                                Text("days left",
-                                                    style: GoogleFonts.lato(
-                                                        color:
-                                                            Color(0xFFFEF7EC),
-                                                        fontSize: 10))
-                                              ]),
-                                              radius: 30,
-                                              backgroundColor:
-                                                  Color(0xFF657BE3)),
-                                          //This is the event name the user provided
-                                          title: Text(_userEventTitles[index],
-                                              style: GoogleFonts.lato()),
-                                          //This is the date the user provided
-                                          subtitle: Text(
-                                              '${_eventDates[index].year}/${_eventDates[index].month}/${_eventDates[index].day}',
-                                              style: GoogleFonts.lato(
-                                                  color: Colors.black)),
-                                        ),
-                                        //to be implemented
-                                        onPressed: () {},
-                                        //button decoration stuff
-                                        style: ElevatedButton.styleFrom(
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(15.0)),
-                                          side: BorderSide(
-                                              width: 3.0,
-                                              color: Color(0xFF657BE3)),
-                                          fixedSize: Size(300, 80),
-                                          primary: Color(0xFFFEF7EC),
-                                        )),
+                                                          fontSize: 10))
+                                                ]),
+                                                radius: 30,
+                                                backgroundColor:
+                                                    Color(0xFF657BE3)),
+                                            //This is the event name the user provided
+                                            title: Text(_userEventTitles[index],
+                                                style: GoogleFonts.lato()),
+                                            //This is the date the user provided
+                                            subtitle: Text(
+                                                '${_eventDates[index].year}/${_eventDates[index].month}/${_eventDates[index].day}',
+                                                style: GoogleFonts.lato(
+                                                    color: Colors.black)),
+                                          ),
+                                          //to be implemented
+                                          onPressed: () async {
+                                            await _userEvents[index].getCollaborationPage().constructorHelperMethod();
+                                            Navigator.push(context, MaterialPageRoute(builder: (context) => Home(user: _user, event: _userEvents[index])));
+                                          },
+                                          //button decoration stuff
+                                          style: ElevatedButton.styleFrom(
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(15.0)),
+                                            side: BorderSide(
+                                                width: 3.0,
+                                                color: Color(0xFF657BE3)),
+                                            fixedSize: Size(300, 80),
+                                            primary: Color(0xFFFEF7EC),
+                                          )),
+                                    ),
                                   ));
                                 }),
                           ),
@@ -178,6 +187,8 @@ class _EventsHomeState extends State<EventsHomePage> {
                           padding: EdgeInsets.fromLTRB(300.0, 20.0, 0.0, 15.0),
                           child: FloatingActionButton(
                               backgroundColor: Color(0xFFBAE365),
+                              foregroundColor: Colors.black,
+                              heroTag: UniqueKey(),
                               //When the button is pressed, it pulls up a bottom sheet and calls CreateEventPopup widget
                               //This widget is located in the create_event_popup.dart file
                               onPressed: () {
@@ -378,7 +389,7 @@ class _EventsHomeState extends State<EventsHomePage> {
                                                   ),
                                                   //This listTile contains the Close and Create buttons at the bottom of the popup
                                                   ListTile(
-                                                      //Close button is leading
+                                                      //Close button is leadinfg
                                                       leading: ElevatedButton(
                                                         child: Text("Close",
                                                             style: GoogleFonts

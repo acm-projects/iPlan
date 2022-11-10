@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'Frontend/Event_Manager/events_home_page.dart';
 import 'Frontend/Finance/budget.dart';
 import 'Frontend/Collaboration/collaboration.dart';
 import 'Frontend/Calendar/calendar.dart';
@@ -45,6 +46,17 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Color(0xFF657BE3),
+        leading: Hero(
+          tag: currentIndex,
+          child: IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.black),
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => EventsHomePage(user: _user))),
+          ),
+        ),
+      ),
       body: IndexedStack(
         index: currentIndex,
         children: screens,

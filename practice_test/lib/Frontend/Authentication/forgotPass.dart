@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'login.dart';
+
 class forgotPass extends StatefulWidget {
   @override
   _forgotPassState createState() => _forgotPassState();
@@ -88,12 +90,11 @@ class _forgotPassState extends State<forgotPass> {
                         SizedBox(height: 40),
                         email(_emailController),
                         SizedBox(height: 40),
-                        //sign in button
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 25.0),
                           width: double.infinity,
                           child: FloatingActionButton(
-                            onPressed: () => signIn,
+                            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => Login())),
                             elevation: 5,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(25),
@@ -127,7 +128,7 @@ class _forgotPassState extends State<forgotPass> {
                               style: ButtonStyle(
                                 backgroundColor: MaterialStateProperty.all(Colors.transparent),
                               ),
-                              onPressed: () => print("Reroute to sign in page"),
+                              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => Login())),
                               child: Text(
                                 'Sign in now!',
                                 style: GoogleFonts.lato(

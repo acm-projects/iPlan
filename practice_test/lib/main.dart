@@ -9,6 +9,8 @@ import 'Backend/User_Creation/user.dart';
 import 'Backend/User_Creation/user_assembler.dart';
 import 'Backend/User_Creation/user_creator.dart';
 
+import 'Frontend/Authentication/welcomePage.dart';
+import 'Frontend/Event_Manager/events_home_page.dart';
 import 'home.dart';
 
 late User user;
@@ -16,42 +18,6 @@ late User user;
 late Event event;
 
 void main() async {
-  List<dynamic> ans;
-  // ans = await UserCreator.createNewUser(
-  //     email: "jon.perry@gmail.com",
-  //     password: "absolute_legend",
-  //     name: "Jon Perry");
-
-  // String userID = "";
-  // if (ans[0] == UserCreator.success) {
-  //   userID = ans[1];
-  // }
-
-  String? userID = await LogInAuthentication.logInWithEmail(
-      email: "jon.perry@gmail.com", password: "absolute_legend");
-
-  UserAssembler userAssembler = UserAssembler(userID: userID!);
-  ans = await userAssembler.assembleUserFromCloud();
-
-  if (ans[0] == UserAssembler.success) {
-    user = ans[1];
-  }
-
-  // ans = await EventCreator.createEvent(
-  //     eventName: "iPlan 3.0",
-  //     budget: 24999.99,
-  //     date: DateTime(2022, 12, 03),
-  //     startTime: TimeOfDay(hour: 12, minute: 30),
-  //     endTime: TimeOfDay(hour: 18, minute: 45) ,
-  //     user: user);
-
-  // if (ans[0] == EventCreator.success) {
-  //   event = ans[1];
-  // }
-
-  event = user.getEvents()[0];
-  await event.getCollaborationPage().constructorHelperMethod();
-
   runApp(MyApp());
 }
 
@@ -59,7 +25,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "Budget Home Page",
+      title: "iPlan",
       theme: ThemeData(
         timePickerTheme: _timePickerTheme,
         textButtonTheme: TextButtonThemeData(
@@ -71,7 +37,10 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: Home(user: user, event: event),
+      // routes: {
+      //   '/': (context) => WelcomePage(),
+      // },
+      home: WelcomePage(),
     );
   }
 }
