@@ -402,23 +402,9 @@ class _EventTimeState extends State<EventTime> {
 //This method properly formats the times displayed by adding an extra 0 so the entire widget doesn't shift
 //This method is for the userTimesBeforeEventTime list
 String displayTimeBefore(int index) {
-  String displayTime = "";
-  if (_tasksBeforeEvent[index].getItemTime().hour < 10) {
-    displayTime += "0";
-    displayTime += '${_tasksBeforeEvent[index].getItemTime().hour.toString()}:';
-  } else {
-    displayTime +=
-        '${_tasksBeforeEvent[index].getItemTime().hour.toString()}:${_tasksBeforeEvent[index].getItemTime().minute.toString()}';
-  }
-  if (_tasksBeforeEvent[index].getItemTime().minute < 10) {
-    displayTime += "0";
-    displayTime +=
-        '${_tasksBeforeEvent[index].getItemTime().minute.toString()}';
-  } else {
-    displayTime +=
-        '${_tasksBeforeEvent[index].getItemTime().minute.toString()}';
-  }
-  return displayTime;
+  int hour = _tasksBeforeEvent[index].getItemTime().hour;
+  int minute = _tasksBeforeEvent[index].getItemTime().minute;
+  return "${((hour > 10) ? "$hour" : "0$hour")}:${((minute > 10) ? "$minute" : "0$minute")}";
 }
 
 //This method properly formats the times displayed by adding an extra 0 so the entire widget doesn't shift

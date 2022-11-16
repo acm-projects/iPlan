@@ -134,10 +134,10 @@ class _WhiteSquareState extends State<WhiteSquare> {
       (contact.emails!.isNotEmpty)
           ? InviteCollaborator.sendEmail(
               email: contactInfo,
-              link: _collaborationPage.getInviteLink() + tempUserID)
+              link: "${_collaborationPage.getInviteLink()}%${tempUserID}")
           : InviteCollaborator.sendSMS(
               phoneNumber: contactInfo,
-              link: _collaborationPage.getInviteLink() + tempUserID);
+              link: "${_collaborationPage.getInviteLink()}%${tempUserID}");
       _updateEventObject();
     }
   }

@@ -71,7 +71,8 @@ class Event {
 
     _financePage = FinancePage.fromJson(json: json["financePage"]);
     _calendarPage = CalendarPage.fromJson(json: json["calendarPage"]);
-    _itineraryPage = ItineraryPage.fromJson(eventStartTime: _startTime, json: json["itineraryPage"]);
+    _itineraryPage = ItineraryPage.fromJson(
+        eventStartTime: _startTime, json: json["itineraryPage"]);
     _collaborationPage =
         CollaborationPage.fromJson(json: json["collaborationPage"], link: link);
   }

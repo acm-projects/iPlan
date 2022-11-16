@@ -67,6 +67,16 @@ class User {
     }
   }
 
+  /// Updates the current user's [_userName] to be equal to the value of the passed [newName]
+  void updateUserName({required String newName}) {
+    _userName = newName;
+  }
+
+  /// Updates the current user's [_email] to be equal to the value of the passed [newEmail]
+  void updateEmail({required String newEmail}) {
+    _email = newEmail;
+  }
+
   /// Returns the user's ID
   String getUserID() {
     return _userID;

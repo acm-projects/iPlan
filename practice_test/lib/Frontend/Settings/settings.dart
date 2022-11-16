@@ -11,21 +11,30 @@ store and retrieve user info
  */
 
 //can be replaced with backend user class, requires name/email/password
-import '../Helpers/user.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase;
+import 'package:practice_test/Backend/Authentication/log_out_authentication.dart';
+import 'package:practice_test/Backend/Authentication/update_files.dart';
 
+import '../../Backend/Event_Manager/event.dart';
 import '../Authentication/welcomePage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../Backend/Authentication/settings.dart' as backendSettings;
+import '../../Backend/User_Creation/user.dart' as backendUser;
+
+late backendUser.User _user;
+
 class Settings extends StatefulWidget {
+  Settings({required backendUser.User user}) {
+    _user = user;
+  }
   @override
   _SettingsState createState() => _SettingsState();
 }
 
 class _SettingsState extends State<Settings> {
   //initializes user for testing purposes only
-  User testUser =
-      new User(name: "Jon", email: "jon@gmail.com", password: "iplan");
 
   //TODO: saving state of notifications switch
   bool isSwitched = false;
@@ -48,14 +57,63 @@ class _SettingsState extends State<Settings> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
-    //TODO: for backend, update user info
     Future updateInfo() async {
-      if (_confPasswordController.text.trim() == testUser.password) {
-        if (_nameController.text.isNotEmpty) {
-          testUser.name = _nameController.text.trim();
+      // Get the confirmation password
+      String confirmationPassword = _confPasswordController.text.trim();
+      // Attempt to validate the user information
+      List<dynamic> ans = await backendSettings.Settings.validatePassword(
+          email: _user.getEmail(), password: confirmationPassword);
+      firebase.User firebaseUser;
+      // If validating the password was successful, then we are good to go
+      if (ans[0] == backendSettings.Settings.success) {
+        print("Passwords matched");
+        firebaseUser = ans[1];
+      } else {
+        // Otherwise, nothing more can be done
+        print("Passwords do not match / other error");
+        return;
+      }
+
+      // If the new password field is not empty, then go ahead and change it
+      String newPassword = _passwordController.text.trim();
+      if (newPassword.isNotEmpty) {
+        ans = await backendSettings.Settings.changePassword(
+            firebaseUser: firebaseUser, newPassword: newPassword);
+        if (ans[0] == backendSettings.Settings.success) {
+          print("Password change successful");
+          firebaseUser = ans[1];
+        } else {
+          print("Password change failed");
         }
-        if (_passwordController.text.isNotEmpty) {
-          testUser.password = _passwordController.text.trim();
+      }
+
+      // If the new name field is not empty, then go ahead and change it
+      String newName = _nameController.text.trim();
+      if (newName.isNotEmpty) {
+        ans = await backendSettings.Settings.changeUserName(
+            firebaseUser: firebaseUser,
+            backendUser: _user,
+            newUserName: newName);
+        if (ans[0] == backendSettings.Settings.success) {
+          print("Username change successful");
+          firebaseUser = ans[1];
+          _user = ans[2];
+        } else if (ans[0] ==
+            backendSettings.Settings.backendUpdateEmailFailed) {
+          print("Username failed to change in backend");
+          firebaseUser = ans[1];
+          _user = ans[2];
+          return;
+        } else {
+          print("Username change failed");
+          return;
+        }
+
+        // Lastly, update each instance of the user object in each of their events
+        for (Event event in _user.getEvents()) {
+          event.updateCollaborator(oldUserID: _user.getUserID(), user: _user);
+          UpdateFiles.updateEventFile(
+              documentID: event.getLink(), json: event.toJson());
         }
       }
     }
@@ -101,7 +159,7 @@ class _SettingsState extends State<Settings> {
                       child: Column(
                         children: [
                           Text(
-                            testUser.getName(),
+                            _user.getUserName(),
                             style: GoogleFonts.lato(
                               textStyle: TextStyle(
                                 color: Colors.black,
@@ -112,7 +170,7 @@ class _SettingsState extends State<Settings> {
                           ),
                           SizedBox(height: 5.0),
                           Text(
-                            testUser.getEmail(),
+                            _user.getEmail(),
                             style: GoogleFonts.lato(
                               textStyle: TextStyle(
                                 color: Colors.black,
@@ -159,8 +217,8 @@ class _SettingsState extends State<Settings> {
                         ),
                         SizedBox(width: 50),
                         ElevatedButton(
-                          onPressed: () {
-                            updateInfo();
+                          onPressed: () async {
+                            await updateInfo();
                             _nameController.clear();
                             _passwordController.clear();
                             _confPasswordController.clear();
@@ -237,10 +295,17 @@ class _SettingsState extends State<Settings> {
                       height: 50,
                       child: FloatingActionButton(
                         heroTag: "settings1",
-                        onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => WelcomePage())),
+                        onPressed: () async {
+                          bool success = await LogOutAuthentication.signOut();
+                          if (!success) {
+                            print("Unable to log user out");
+                          } else {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => WelcomePage()));
+                          }
+                        },
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(25),
                         ),

@@ -40,7 +40,7 @@ class _HomeState extends State<Home> {
     Budget(user: _user, event: _event),
     Itinerary(user: _user, event: _event),
     Collaboration(user: _user, event: _event),
-    Settings(),
+    Settings(user: _user),
   ];
 
   @override

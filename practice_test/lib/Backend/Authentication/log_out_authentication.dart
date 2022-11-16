@@ -8,13 +8,11 @@ class LogOutAuthentication {
   /// If unsuccessful, returns false.
   static Future<bool> signOut() async {
     try {
-      await FirebaseAuth.instance.signOut().then((value) {
-        return true;
-      });
+      await FirebaseAuth.instance.signOut();
+      return true;
     } catch (e) {
       print(e);
       return false;
     }
-    return false; // Because dart is "smart" sometimes
   }
 }
