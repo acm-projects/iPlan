@@ -11,19 +11,30 @@ store and retrieve user info
  */
 
 //can be replaced with backend user class, requires name/email/password
-import '../Helpers/user.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase;
+import 'package:practice_test/Backend/Authentication/log_out_authentication.dart';
+import 'package:practice_test/Backend/Authentication/update_files.dart';
 
+import '../../Backend/Event_Manager/event.dart';
+import '../Authentication/welcomePage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../Backend/Authentication/settings.dart' as backendSettings;
+import '../../Backend/User_Creation/user.dart' as backendUser;
+
+late backendUser.User _user;
+
 class Settings extends StatefulWidget {
+  Settings({required backendUser.User user}) {
+    _user = user;
+  }
   @override
   _SettingsState createState() => _SettingsState();
 }
 
 class _SettingsState extends State<Settings> {
   //initializes user for testing purposes only
-  User testUser = new User(name: "Jon", email: "jon@gmail.com", password: "iplan");
 
   //TODO: saving state of notifications switch
   bool isSwitched = false;
@@ -35,7 +46,7 @@ class _SettingsState extends State<Settings> {
   final _confPasswordController = TextEditingController();
 
   @override
-  void dispose(){
+  void dispose() {
     _nameController.dispose();
     _passwordController.dispose();
     _confPasswordController.dispose();
@@ -46,14 +57,63 @@ class _SettingsState extends State<Settings> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
-    //TODO: for backend, update user info
-    Future updateInfo() async{
-      if (_confPasswordController.text.trim() == testUser.password){
-        if(_nameController.text.isNotEmpty){
-          testUser.name = _nameController.text.trim();
+    Future updateInfo() async {
+      // Get the confirmation password
+      String confirmationPassword = _confPasswordController.text.trim();
+      // Attempt to validate the user information
+      List<dynamic> ans = await backendSettings.Settings.validatePassword(
+          email: _user.getEmail(), password: confirmationPassword);
+      firebase.User firebaseUser;
+      // If validating the password was successful, then we are good to go
+      if (ans[0] == backendSettings.Settings.success) {
+        print("Passwords matched");
+        firebaseUser = ans[1];
+      } else {
+        // Otherwise, nothing more can be done
+        print("Passwords do not match / other error");
+        return;
+      }
+
+      // If the new password field is not empty, then go ahead and change it
+      String newPassword = _passwordController.text.trim();
+      if (newPassword.isNotEmpty) {
+        ans = await backendSettings.Settings.changePassword(
+            firebaseUser: firebaseUser, newPassword: newPassword);
+        if (ans[0] == backendSettings.Settings.success) {
+          print("Password change successful");
+          firebaseUser = ans[1];
+        } else {
+          print("Password change failed");
         }
-        if(_passwordController.text.isNotEmpty){
-          testUser.password = _passwordController.text.trim();
+      }
+
+      // If the new name field is not empty, then go ahead and change it
+      String newName = _nameController.text.trim();
+      if (newName.isNotEmpty) {
+        ans = await backendSettings.Settings.changeUserName(
+            firebaseUser: firebaseUser,
+            backendUser: _user,
+            newUserName: newName);
+        if (ans[0] == backendSettings.Settings.success) {
+          print("Username change successful");
+          firebaseUser = ans[1];
+          _user = ans[2];
+        } else if (ans[0] ==
+            backendSettings.Settings.backendUpdateEmailFailed) {
+          print("Username failed to change in backend");
+          firebaseUser = ans[1];
+          _user = ans[2];
+          return;
+        } else {
+          print("Username change failed");
+          return;
+        }
+
+        // Lastly, update each instance of the user object in each of their events
+        for (Event event in _user.getEvents()) {
+          event.updateCollaborator(oldUserID: _user.getUserID(), user: _user);
+          UpdateFiles.updateEventFile(
+              documentID: event.getLink(), json: event.toJson());
         }
       }
     }
@@ -64,7 +124,7 @@ class _SettingsState extends State<Settings> {
       body: Column(
         children: [
           Padding(
-            padding: EdgeInsets.fromLTRB(0.0, 50.0, 0.0, 5.0),
+            padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
             child: Center(
               child: Text.rich(
                 TextSpan(
@@ -84,7 +144,7 @@ class _SettingsState extends State<Settings> {
             child: Padding(
               padding: EdgeInsets.fromLTRB(0.0, 9.0, 0.0, 0.0),
               child: Container(
-                height: size.height - 184.0,
+                height: size.height - 229.0,
                 decoration: BoxDecoration(
                   color: Color(0xFFFEF7EC),
                   borderRadius: BorderRadius.only(
@@ -93,13 +153,13 @@ class _SettingsState extends State<Settings> {
                   ),
                 ),
                 child: ListView(
-                  children:[
+                  children: [
                     SizedBox(height: 25),
                     Center(
                       child: Column(
                         children: [
                           Text(
-                            testUser.getName(),
+                            _user.getUserName(),
                             style: GoogleFonts.lato(
                               textStyle: TextStyle(
                                 color: Colors.black,
@@ -110,7 +170,7 @@ class _SettingsState extends State<Settings> {
                           ),
                           SizedBox(height: 5.0),
                           Text(
-                            testUser.getEmail(),
+                            _user.getEmail(),
                             style: GoogleFonts.lato(
                               textStyle: TextStyle(
                                 color: Colors.black,
@@ -128,60 +188,63 @@ class _SettingsState extends State<Settings> {
                     SizedBox(height: 20),
                     confPassword(),
                     SizedBox(height: 30),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 80.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          OutlinedButton(
-                            style: ButtonStyle(
-                              padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 50.0)),
-                              shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(25.0),
-                              )),
-                            ),
-                            onPressed: () {
-                              _nameController.clear();
-                              _passwordController.clear();
-                              _confPasswordController.clear();
-                            },
-                            child: Text(
-                              "Cancel",
-                              style: GoogleFonts.lato(
-                                textStyle: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15.0,
-                                ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        OutlinedButton(
+                          style: ButtonStyle(
+                            padding: MaterialStateProperty.all(
+                                EdgeInsets.symmetric(horizontal: 50.0)),
+                            shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25.0),
+                            )),
+                          ),
+                          onPressed: () {
+                            _nameController.clear();
+                            _passwordController.clear();
+                            _confPasswordController.clear();
+                          },
+                          child: Text(
+                            "Cancel",
+                            style: GoogleFonts.lato(
+                              textStyle: TextStyle(
+                                color: Colors.black,
+                                fontSize: 15.0,
                               ),
                             ),
                           ),
-                          ElevatedButton(
-                            onPressed: () {
-                              updateInfo();
-                              _nameController.clear();
-                              _passwordController.clear();
-                              _confPasswordController.clear();
-                              setState((){});
-                            },
-                            style: ButtonStyle(
-                              padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 50)),
-                              shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(25.0),
-                              )),
-                              backgroundColor: MaterialStateProperty.all(Color.fromRGBO(186, 227, 101, 1)),
-                            ),
-                            child: Text(
-                              "Save",
-                              style: GoogleFonts.lato(
-                                textStyle: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15.0,
-                                ),
+                        ),
+                        SizedBox(width: 50),
+                        ElevatedButton(
+                          onPressed: () async {
+                            await updateInfo();
+                            _nameController.clear();
+                            _passwordController.clear();
+                            _confPasswordController.clear();
+                            setState(() {});
+                          },
+                          style: ButtonStyle(
+                            padding: MaterialStateProperty.all(
+                                EdgeInsets.symmetric(horizontal: 50)),
+                            shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25.0),
+                            )),
+                            backgroundColor: MaterialStateProperty.all(
+                                Color.fromRGBO(186, 227, 101, 1)),
+                          ),
+                          child: Text(
+                            "Save",
+                            style: GoogleFonts.lato(
+                              textStyle: TextStyle(
+                                color: Colors.black,
+                                fontSize: 15.0,
                               ),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                     SizedBox(height: 20),
                     Container(
@@ -198,10 +261,10 @@ class _SettingsState extends State<Settings> {
                       ),
                     ),
                     Column(
-                      children:[
+                      children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children:[
+                          children: [
                             Text(
                               "Notifications",
                               style: GoogleFonts.lato(
@@ -228,12 +291,21 @@ class _SettingsState extends State<Settings> {
                     ),
                     SizedBox(height: 30),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 175.0),
-                      width: 50.0,
+                      padding: EdgeInsets.fromLTRB(100, 0, 100, 0),
+                      height: 50,
                       child: FloatingActionButton(
-                        //TODO: reroute to welcome screen
-                        onPressed: () => print("Do Something"),
-                        elevation: 5,
+                        heroTag: "settings1",
+                        onPressed: () async {
+                          bool success = await LogOutAuthentication.signOut();
+                          if (!success) {
+                            print("Unable to log user out");
+                          } else {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => WelcomePage()));
+                          }
+                        },
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(25),
                         ),
@@ -258,24 +330,10 @@ class _SettingsState extends State<Settings> {
           ),
         ],
       ),
-      //Navigation Bar with Icons
-      bottomNavigationBar: BottomNavigationBar(
-          showSelectedLabels: false,
-          showUnselectedLabels: false,
-          landscapeLayout: BottomNavigationBarLandscapeLayout.centered,
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(icon: Icon(Icons.home, color: Colors.black, size: 30), label: 'Home', backgroundColor: Color(0xFFA3B0EB)),
-            BottomNavigationBarItem(icon: Icon(Icons.calendar_month, color: Colors.black, size: 30), label: 'Calendar', backgroundColor: Color(0xFFA3B0EB)),
-            BottomNavigationBarItem(icon: Icon(Icons.wallet, color: Colors.black, size: 30), label: 'Budget', backgroundColor: Color(0xFFA3B0EB)),
-            BottomNavigationBarItem(icon: Icon(Icons.schedule, color: Colors.black, size: 30), label: 'Itinerary', backgroundColor: Color(0xFFA3B0EB)),
-            BottomNavigationBarItem(icon: Icon(Icons.person_add, color: Colors.black, size: 30), label: 'Collaborate', backgroundColor: Color(0xFFA3B0EB)),
-            BottomNavigationBarItem(icon: Icon(Icons.settings, color: Colors.black, size: 30), label: 'Settings', backgroundColor: Color(0xFFA3B0EB))
-          ]
-      ),
     );
   }
 
-  Widget name(){
+  Widget name() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 25.0),
       child: Container(
@@ -306,7 +364,7 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  Widget password(){
+  Widget password() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 25.0),
       child: Container(
@@ -337,7 +395,7 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  Widget confPassword(){
+  Widget confPassword() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 25.0),
       child: Container(

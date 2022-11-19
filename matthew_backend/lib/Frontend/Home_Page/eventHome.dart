@@ -8,31 +8,58 @@ order tasks from earliest time to latest time in selectedTasks
  */
 
 import 'package:intl/intl.dart';
-
-import '../Helpers/event.dart';
-import '../Helpers/task.dart';
-import '../Date_Picker_Timeline/date_picker_timeline.dart';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../Backend/Authentication/update_files.dart';
+import '../../Backend/Calendar/calendar_page.dart';
+import '../../Backend/Calendar/task.dart';
+import '../../Backend/User_Creation/user.dart';
+import '../../Backend/Event_Manager/event.dart';
+
+import '../Date_Picker_Timeline/date_picker_timeline.dart';
+
+late User _user;
+
+late Event _event;
+
+late CalendarPage _calendarPage;
+
+late Map<DateTime, List<Task>> _selectedTasks;
+
+/// @author [MatthewSheldon]
+/// Used to update the [Event] object in the cloud
+void _updateEventObject() async {
+  _event.updateCalendarPage(calendarPage: _calendarPage);
+  _user.updateEvent(eventID: _event.getLink(), event: _event);
+  await UpdateFiles.updateEventFile(
+      documentID: _event.getLink(), json: _event.toJson());
+}
+
+void _buildSelectedTasksFromCalendarPage() {
+  _selectedTasks = <DateTime, List<Task>>{};
+  _calendarPage.getTasks().sort();
+  for (Task task in _calendarPage.getTasks()) {
+    DateTime currDate = task.getDueDate();
+    if (!_selectedTasks.containsKey(currDate)) {
+      _selectedTasks[currDate] = <Task>[];
+    }
+    _selectedTasks[currDate]!.add(task);
+  }
+}
+
 class EventHome extends StatefulWidget {
+  EventHome({super.key, required User user, required Event event}) {
+    _user = user;
+    _event = event;
+    _calendarPage = _event.getCalendarPage();
+    _buildSelectedTasksFromCalendarPage();
+  }
   @override
   _EventHomeState createState() => _EventHomeState();
 }
 
 class _EventHomeState extends State<EventHome> {
-  //selectedTasks maps a date to a list of tasks on that date (same as calendar)
-  //initializes selectedTasks for testing purposes only
-  //TODO: change to Map<DateTime, List<Task>> selectedTasks;
-  Map<DateTime, List<Task>> selectedTasks = {
-    DateTime.utc(2022, DateTime.october, 20): [Task(title: "Cater", day: DateTime.utc(2022, DateTime.october, 20), time: TimeOfDay(hour: 8, minute: 0)), Task(title: "RSVP", day: DateTime.utc(2022, DateTime.october, 20), time: TimeOfDay(hour: 0, minute: 0))],
-    DateTime.utc(2022, DateTime.october, 25): [Task(title: "Cater", day: DateTime.utc(2022, DateTime.october, 25), time: TimeOfDay(hour: 0, minute: 0)), Task(title: "RSVP", day: DateTime.utc(2022, DateTime.october, 25), time: TimeOfDay(hour: 3, minute: 20))],
-  };
-
-  //initializes event for testing purposes only
-  //TODO: change to pull event info from backend
-  Event example = Event(title: "Staff Beach Party", day: DateTime.now());
 
   DatePickerController _controller = DatePickerController();
   //selected date
@@ -48,7 +75,7 @@ class _EventHomeState extends State<EventHome> {
   List<Task> _getTasksfromDay(DateTime date) {
     //manipulates dateTime because of formatting issues
     String strManip = (date.toString()).substring(0, 10) + " 00:00:00.000Z";
-    return selectedTasks[DateTime.parse(strManip)] ?? [];
+    return _selectedTasks[DateTime.parse(strManip)] ?? [];
   }
 
   @override
@@ -61,11 +88,11 @@ class _EventHomeState extends State<EventHome> {
         children: [
           //displays title of event
           Padding(
-            padding: EdgeInsets.fromLTRB(0.0, 50.0, 0.0, 5.0),
+            padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
             child: Center(
               child: Text.rich(
                 TextSpan(
-                  text: example.title,
+                  text: _event.getEventName(),
                   style: GoogleFonts.lato(
                     textStyle: TextStyle(
                       color: Color.fromRGBO(254, 247, 236, 1),
@@ -81,7 +108,7 @@ class _EventHomeState extends State<EventHome> {
             child: Padding(
               padding: EdgeInsets.fromLTRB(0.0, 9.0, 0.0, 0.0),
               child: Container(
-                height: size.height - 184.0,
+                height: size.height - 229.0,
                 decoration: BoxDecoration(
                   color: Color(0xFFFEF7EC),
                   borderRadius: BorderRadius.only(
@@ -95,7 +122,7 @@ class _EventHomeState extends State<EventHome> {
                     //displays date of event
                     Center(
                       child: Text(
-                        DateFormat.MMMM().format(example.day) + DateFormat(' dd, yyyy').format(example.day),
+                        DateFormat.MMMM().format(_event.getDate()) + DateFormat(' dd, yyyy').format(_event.getDate()),
                         style: GoogleFonts.lato(
                           textStyle: TextStyle(
                             color: Colors.black,
@@ -166,20 +193,6 @@ class _EventHomeState extends State<EventHome> {
           ),
         ],
       ),
-      //navigation Bar with Icons
-      bottomNavigationBar: BottomNavigationBar(
-          showSelectedLabels: false,
-          showUnselectedLabels: false,
-          landscapeLayout: BottomNavigationBarLandscapeLayout.centered,
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(icon: Icon(Icons.home, color: Colors.black, size: 30), label: 'Home', backgroundColor: Color(0xFFA3B0EB)),
-            BottomNavigationBarItem(icon: Icon(Icons.calendar_month, color: Colors.black, size: 30), label: 'Calendar', backgroundColor: Color(0xFFA3B0EB)),
-            BottomNavigationBarItem(icon: Icon(Icons.wallet, color: Colors.black, size: 30), label: 'Budget', backgroundColor: Color(0xFFA3B0EB)),
-            BottomNavigationBarItem(icon: Icon(Icons.schedule, color: Colors.black, size: 30), label: 'Itinerary', backgroundColor: Color(0xFFA3B0EB)),
-            BottomNavigationBarItem(icon: Icon(Icons.person_add, color: Colors.black, size: 30), label: 'Collaborate', backgroundColor: Color(0xFFA3B0EB)),
-            BottomNavigationBarItem(icon: Icon(Icons.settings, color: Colors.black, size: 30), label: 'Settings', backgroundColor: Color(0xFFA3B0EB))
-          ]
-      ),
     );
   }
 
@@ -220,17 +233,18 @@ class _EventHomeState extends State<EventHome> {
         activeColor: Color.fromRGBO(186, 227, 101, 1),
         checkColor: Colors.black,
         title: Text(
-          "${task.time.format(context)}".padRight(25) + "${task.title}",
+          "${task.getDueTime().format(context)}".padRight(25) + "${task.getTaskName()}",
           style: GoogleFonts.lato(
-              decoration: task.isComplete
+              decoration: task.getIsComplete()
                   ? TextDecoration.lineThrough
                   : TextDecoration.none
           ),
         ),
-        value: task.isComplete,
+        value: task.getIsComplete(),
         onChanged: (value){
           setState((){
-            task.isComplete = value!;
+            task.updateIsComplete(value: value!);
+            _updateEventObject();
           });
         },
       ),

@@ -112,7 +112,7 @@ class _CalendarState extends State<Calendar> {
         children: [
           //title of page
           Padding(
-            padding: EdgeInsets.fromLTRB(0.0, 50.0, 0.0, 5.0),
+            padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
             child: Center(
               child: Text.rich(
                 TextSpan(
@@ -131,7 +131,7 @@ class _CalendarState extends State<Calendar> {
           Padding(
             padding: EdgeInsets.fromLTRB(0.0, 9.0, 0.0, 0.0),
             child: Container(
-              height: size.height - 184.0,
+              height: size.height - 229.0,
               decoration: BoxDecoration(
                 color: Color(0xFFFEF7EC),
                 borderRadius: BorderRadius.only(
@@ -231,6 +231,7 @@ class _CalendarState extends State<Calendar> {
       ),
       //button to add new task
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'calbtn1',
         onPressed: () {
           showModalBottomSheet(
             isScrollControlled: true,
@@ -293,7 +294,6 @@ class _CalendarState extends State<Calendar> {
                                       time: _timeController);
                                   _updateEventObject();
                                   _buildSelectedTasksFromCalendarPage();
-                                  print(selectedDay.toString());
 
                                   /// end @author [MatthewSheldon]
                                 }
@@ -363,7 +363,7 @@ class _CalendarState extends State<Calendar> {
                               _timeController = (await showTimePicker(
                                 context: context,
                                 initialTime: TimeOfDay.now(),
-                              ))!;
+                              )) ?? const TimeOfDay(hour: 0, minute: 0);
                             },
                           ),
                         ),
@@ -383,37 +383,6 @@ class _CalendarState extends State<Calendar> {
         backgroundColor: Color.fromRGBO(186, 227, 101, 1),
         foregroundColor: Colors.black,
       ),
-      //Navigation Bar with Icons
-      bottomNavigationBar: BottomNavigationBar(
-          showSelectedLabels: false,
-          showUnselectedLabels: false,
-          landscapeLayout: BottomNavigationBarLandscapeLayout.centered,
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-                icon: Icon(Icons.home, color: Colors.black, size: 30),
-                label: 'Home',
-                backgroundColor: Color(0xFFA3B0EB)),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.calendar_month, color: Colors.black, size: 30),
-                label: 'Calendar',
-                backgroundColor: Color(0xFFA3B0EB)),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.wallet, color: Colors.black, size: 30),
-                label: 'Budget',
-                backgroundColor: Color(0xFFA3B0EB)),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.schedule, color: Colors.black, size: 30),
-                label: 'Itinerary',
-                backgroundColor: Color(0xFFA3B0EB)),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.person_add, color: Colors.black, size: 30),
-                label: 'Collaborate',
-                backgroundColor: Color(0xFFA3B0EB)),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.settings, color: Colors.black, size: 30),
-                label: 'Settings',
-                backgroundColor: Color(0xFFA3B0EB))
-          ]),
     );
   }
 

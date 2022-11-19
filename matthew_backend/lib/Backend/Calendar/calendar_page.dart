@@ -8,7 +8,7 @@ import 'task.dart';
 /// date they need to be completed by as well as a name for each task
 class CalendarPage {
   /// The list of [Task] objects for the current event
-  static late List<Task> _tasks;
+  late List<Task> _tasks;
 
   /// Creates a [CalendarPage] object with the passed [title] and [date]
   /// parameters
@@ -42,14 +42,6 @@ class CalendarPage {
         _tasks[i].updateIsComplete(value: value);
       }
     }
-  }
-
-  /// @author [MatthewSheldon]
-  /// Helper method for [Event.fromJson] constructor that takes a [TimeOfDay]
-  /// formatted [String] and returns the converted [TimeOfDay] equivalent object.
-  TimeOfDay _getTimeFromString(String time) {
-    List<String> split = time.split(":");
-    return TimeOfDay(hour: int.parse(split[0]), minute: int.parse(split[1]));
   }
 
   /// @author [MatthewSheldon]

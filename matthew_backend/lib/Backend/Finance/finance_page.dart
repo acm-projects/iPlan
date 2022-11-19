@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:matthew_backend/Backend/Finance/expense.dart';
-import 'package:matthew_backend/Backend/Finance/finance_category.dart';
+
+import 'expense.dart';
+import 'finance_category.dart';
 
 /// @author [MatthewSheldon]
 /// The [FinancePage] class represents all of the information and operations

@@ -12,9 +12,6 @@ import '../Authentication/update_files.dart';
 /// create a new event, use [createEvent]. If the user is wanting to join
 /// an existing event via an invite link, use [joinEventFromLink].
 class EventCreator {
-  /// Represents the number of characters in an event link
-  static const eventLinkLength = 20;
-
   /// Code returned when [createEvent] or [joinEventFromLink] encountered no errors
   static const success = 0;
 
@@ -124,12 +121,13 @@ class EventCreator {
 
     List<dynamic> ans = <dynamic>[];
     String oldUserID = "";
+    List<String> split = link.split("%");
 
     // If the length of the link does not equal just the length of the event ID...
-    if (link.length > eventLinkLength) {
+    if (split.length == 2) {
       // ...Then the user was directly invited, so additional overhead is needed
-      oldUserID = link.substring(eventLinkLength);
-      link = link.substring(0, eventLinkLength);
+      oldUserID = split[1];
+      link = split[0];
     }
     print("event ID: $link");
     print("old user ID: $oldUserID");
@@ -150,7 +148,7 @@ class EventCreator {
     // Create the event object from the json file
     Event event = Event.fromJson(json: json, link: link);
     // If the user was directly invited...
-    if (oldUserID.isNotEmpty) {
+    if (split.length == 2) {
       // Update the Collaborator object that temporarially was assigned to them
       event.updateCollaborator(oldUserID: oldUserID, user: user);
     } else {
