@@ -3,6 +3,20 @@ import 'package:firebase_auth/firebase_auth.dart' as firebase;
 import 'package:practice_test/Backend/Authentication/update_files.dart';
 import '../User_Creation/user.dart' as backend;
 
+/// @author [MatthewSheldon]
+/// The [Settings] class handles all backend operations described in
+/// "Frontend\Settings\settings.dart" which includes being able to change the
+/// the user's password, change the user's username, and the addition of being
+/// able to change the user's email. These are accomplished by the [changePassword],
+/// [changeUserName], and [changeEmail] methods, respectively. Additioanlly,
+/// for any one of these methods to work successfully in the cloud with respect
+/// to Firebase, a call to [validatePassword] must be made within the last five
+/// or so minutes. It is encourages to require the use of [validatePassword]
+/// regardless of the time transpired since they logged in. The return type of
+/// each of the methods includes both an error code, which, on success, will be
+/// [Settings.success], in addition to their requested information. Please refer
+/// to the method description for each to get a more comprehensive description
+/// as to what is returned and what is accomplished.
 class Settings {
   /// Code returned when [validatePassword], [changePassword],
   /// [changeEmail], or [changeUserName] encountered no errors
