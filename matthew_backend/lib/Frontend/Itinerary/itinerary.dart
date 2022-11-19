@@ -410,20 +410,7 @@ String displayTimeBefore(int index) {
 //This method properly formats the times displayed by adding an extra 0 so the entire widget doesn't shift
 //This method is for the userTimesDuringEventTime list
 String displayTimeDuring(int index) {
-  String displayTime = "";
-  if (_tasksDuringEvent[index].getItemTime().hour < 10) {
-    displayTime += "0";
-    displayTime += '${_tasksDuringEvent[index].getItemTime().hour.toString()}:';
-  } else {
-    displayTime += '${_tasksDuringEvent[index].getItemTime().hour.toString()}:';
-  }
-  if (_tasksDuringEvent[index].getItemTime().minute < 10) {
-    displayTime += "0";
-    displayTime +=
-        '${_tasksDuringEvent[index].getItemTime().minute.toString()}';
-  } else {
-    displayTime +=
-        '${_tasksDuringEvent[index].getItemTime().minute.toString()}';
-  }
-  return displayTime;
+  int hour = _tasksDuringEvent[index].getItemTime().hour;
+  int minute = _tasksDuringEvent[index].getItemTime().minute;
+  return "${((hour > 10) ? "$hour" : "0$hour")}:${((minute > 10) ? "$minute" : "0$minute")}";
 }

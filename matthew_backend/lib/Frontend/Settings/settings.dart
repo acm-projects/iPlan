@@ -57,6 +57,7 @@ class _SettingsState extends State<Settings> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
+    /// @author [MatthewSheldon]
     Future updateInfo() async {
       // Get the confirmation password
       String confirmationPassword = _confPasswordController.text.trim();
