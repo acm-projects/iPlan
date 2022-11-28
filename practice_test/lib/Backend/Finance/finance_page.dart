@@ -68,15 +68,16 @@ class FinancePage {
 
   /// Removes a [FinanceCategory] from [_listOfCategories] described by the
   /// passed [categoryName].
-  void removeCategory({required String categoryName}) {
+  bool removeCategory({required String categoryName}) {
     for (int i = 0; i < _listOfCategories.length; i++) {
       if (_listOfCategories[i].getCategoryName() == categoryName) {
         FinanceCategory removedCategory = _listOfCategories.removeAt(i);
         _budgetSpent -= removedCategory.getTotalBudget();
         _budgetRemaining = _totalBudget - _budgetSpent;
-        return;
+        return true;
       }
     }
+    return false;
   }
 
   /// Adds an [Expense] object described by the [expenseName] and
@@ -98,14 +99,14 @@ class FinancePage {
   /// Removes an [Expense] object described by [expenseName] from a
   /// [FinanceCategory] object described by [categoryName] contained within
   /// [_listOfCategories].
-  void removeExpenseFromCategory(
+  bool removeExpenseFromCategory(
       {required String categoryName, required String expenseName}) {
     for (int i = 0; i < _listOfCategories.length; i++) {
       if (_listOfCategories[i].getCategoryName() == categoryName) {
-        _listOfCategories[i].removeItem(expenseName: expenseName);
-        return;
+        return _listOfCategories[i].removeItem(expenseName: expenseName);
       }
     }
+    return false;
   }
 
   /// Updates the budget of a [FinanceCategory] described by [categoryName] to

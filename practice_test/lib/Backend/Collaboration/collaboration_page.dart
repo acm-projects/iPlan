@@ -179,6 +179,18 @@ class CollaborationPage {
     }
   }
 
+  /// Removes the passed collaborator from the list of collaborators.
+  /// Used strictly for the purposes of testing
+  bool removeCollaborator({required String collaboratorName}) {
+    for (int i = 0; i < _collaborators.length; i++) {
+      if (_collaborators[i].getName() == collaboratorName) {
+        _collaborators.removeAt(i);
+        return true;
+      }
+    }
+    return false;
+  }
+
   /// Adds the passed [User] object as a [Collaborator] object to the [_collaborators] list
   void addCollaboratorFromUser({required User user}) {
     _collaborators.add(Collaborator.fromUser(user: user));

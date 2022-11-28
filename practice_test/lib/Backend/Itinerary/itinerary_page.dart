@@ -100,6 +100,22 @@ class ItineraryPage {
   }
 
   /// @author [MatthewSheldon]
+  /// Removes the passed task from the list of tasks.
+  /// Used Strictly for the purposes of testing
+  bool removeTask({required bool isBefore, required String taksName}) {
+    for (int i = 0;
+        i < (isBefore ? _tasksBefore.length : _tasksDuring.length);
+        i++) {
+      if ((isBefore ? _tasksBefore : _tasksDuring)[i].getItemName() ==
+          taksName) {
+        (isBefore ? _tasksBefore : _tasksDuring).removeAt(i);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// @author [MatthewSheldon]
   /// Converts the current [ItineraryPage] object into a json file formatted [Map]
   Map<String, dynamic> toJson() {
     return <String, dynamic>{

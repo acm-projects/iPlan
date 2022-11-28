@@ -72,15 +72,16 @@ class FinanceCategory {
   /// Removes the [Expense] object described by the passed [expenseName] from
   /// this [FinanceCategory]'s [_listOfExpenses]. Additionally, update the
   /// [_budgetUsed] and [_budgetRemaining].
-  void removeItem({required String expenseName}) {
+  bool removeItem({required String expenseName}) {
     for (int i = 0; i < _listOfExpenses.length; i++) {
       if (_listOfExpenses[i].getExpenseName() == expenseName) {
         Expense removedExpense = _listOfExpenses.removeAt(i);
         _budgetUsed -= removedExpense.getExpenseBudget();
         _budgetRemaining = _totalBudget - _budgetUsed;
-        return;
+        return true;
       }
     }
+    return false;
   }
 
   /// Returns the name given to this [FinanceCategory]

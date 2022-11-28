@@ -45,6 +45,18 @@ class CalendarPage {
   }
 
   /// @author [MatthewSheldon]
+  /// Removes the the task from the calendar. Used strictly for the sake of testing
+  bool removeTask({required String taskName}) {
+    for (int i = 0; i < _tasks.length; i++) {
+      if (_tasks[i].getTaskName() == taskName) {
+        _tasks.removeAt(i);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// @author [MatthewSheldon]
   /// Converts the current [Event] object into a json file formatted [Map]
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
