@@ -2,7 +2,6 @@ import 'package:contacts_service/contacts_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../User_Creation/user.dart';
-import '../Navigation_Bar/page_type.dart';
 import 'Contact_Search/contact_mapper.dart';
 import 'Contact_Search/contact_puller.dart';
 import 'Collaborator/collaborator.dart';
@@ -80,12 +79,6 @@ class CollaborationPage {
       _contactPuller.openSettings();
     }
     return true;
-  }
-
-  /// Returns a [PageType] object representing the page that the user should
-  /// be returned to given that they are currently on the Collaboration Page
-  PageType backButton() {
-    return PageType.homeScreen;
   }
 
   /// Returns the [_title] of the event
